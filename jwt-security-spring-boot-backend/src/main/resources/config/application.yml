@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: example-server
+
+  profiles:
+    include:
+      - jwt-security
+
+  datasource:
+    url: jdbc:h2:mem:demo
+    #    url: jdbc:h2:~/demo #User folder
+    #    url: jdbc:h2:file:./demo_db #Specific folder
+    driver-class-name: org.h2.Driver
+
+  flyway:
+    enabled: false
+
+  jpa:
+    show-sql: true
+
+    hibernate:
+      ddl-auto: create-drop
+      #      ddl-auto: update
+      use-new-id-generator-mappings: true
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  servlet:
+    contextPath: /
+  port: 8080
+
+logging:
+  level:
+    ROOT: info
+
+######## JWT Security Configuration
+#security.jwt:
+#  token:
+#    expiration: 600000
+#    secret-key: secret-key-for-encryption
+#    roles-key: roles
+#    header-name: Authorization
+#    password-strength: 7
+#    prefix: Bearer
+#  roles:
+#    -
+#      name: ROLE_ADMIN
+#      description: Super Admin
+#    -
+#      name: ROLE_USER
+#      description: Simple User
+#  users:
+#    -
+#      username: root
+#      password: root
+#      roles:
+#        - ROLE_ADMIN
+#        - ROLE_USER
+

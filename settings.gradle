@@ -1,0 +1,6 @@
+rootProject.name = 'jwt-security-spring-boot'
+
+include 'jwt-security-spring-boot-starter'
+include 'jwt-security-spring-boot-backend'
+include 'jwt-security-spring-boot-frontend'
+
