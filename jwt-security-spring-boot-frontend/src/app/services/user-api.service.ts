@@ -22,8 +22,8 @@ export class UserApiService {
     private http: HttpClient
   ) { }
 
-  public singup(singup: SignUp): Observable<any> {
-    return this.http.post(API_URL + 'singup', singup, httpOptions);
+  public create(singup: SignUp): Observable<any> {
+    return this.http.post(API_URL + 'create', singup, httpOptions);
   }
 
   public logout(user: User): Observable<any> {
@@ -32,5 +32,9 @@ export class UserApiService {
 
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(API_URL, httpOptions);
+  }
+
+  getUser(userId: number): Observable<User> {
+    return this.http.get<User>(API_URL + userId, httpOptions);
   }
 }

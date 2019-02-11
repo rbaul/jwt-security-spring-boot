@@ -66,7 +66,7 @@ public class UserService {
      * @param signUpDto singup information
      * @return Optional of user, empty if the user already exists.
      */
-    public Optional<User> signup(SignUpDto signUpDto) {
+    public Optional<User> create(SignUpDto signUpDto) {
         log.info("New user attempting to sign in");
         Optional<User> user = Optional.empty();
         if (!userRepository.findByUsername(signUpDto.getUsername()).isPresent()) {
@@ -82,7 +82,33 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Create a new user in the database.
+     *
+     * @param userId User ID
+     * @param signUpDto singup information
+     * @return Optional of user, empty if the user already exists.
+     */
+    public User update(long userId, SignUpDto signUpDto) {
+//        Optional<User> user = Optional.empty();
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Not Found"));
+        Role role = roleRepository.findByRoleName(signUpDto.getRole())
+                .orElseThrow(() -> new RuntimeException("Role not present"));
+
+        user.setUsername(signUpDto.getUsername());
+        user.setFirstName(signUpDto.getFirstName());
+        user.setLastName(signUpDto.getLastName());
+        user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
+        user.setRoles(Collections.singletonList(role));
+        user.setFirstName(signUpDto.getFirstName());
+        return user;
+    }
+
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    public Optional<User> getUser(long userId) {
+        return userRepository.findById(userId);
     }
 }

@@ -28,6 +28,8 @@ public class JwtSecurityProperties {
             new JwtSecurityRoleProperties("ROLE_USER", "User")
     );
 
+    private JwtSecurityUserApiRoleProperties apiUserRoles = new JwtSecurityUserApiRoleProperties();
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -63,5 +65,15 @@ public class JwtSecurityProperties {
         private String username;
         private String password;
         private List<String> roles;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ConfigurationProperties(prefix = "security.jwt.api")
+    @EnableConfigurationProperties
+    public static class JwtSecurityUserApiRoleProperties {
+        private String crud = "ROLE_ADMIN";
     }
 }
