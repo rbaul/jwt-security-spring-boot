@@ -1,0 +1,33 @@
+<div class="wrapper">
+  <mat-toolbar color="primary" class="mat-elevation-z8">
+    <button mat-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>{{title}}</span>
+
+    <!-- This fills the remaining space of the current row -->
+    <span class="example-fill-remaining-space"></span>
+
+    <mat-icon>account_circle</mat-icon>
+    <span>{{loggedUser}}</span>
+    <button mat-button (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav #sidenav mode="side" opened class="example-sidenav"
+                  fixedInViewport="false">
+      <mat-nav-list role="navigation" aria-label>
+          <mat-list-item *ngFor="let item of listItems" (click)="handleClick(item)" class="example-item">
+              <mat-icon  matListIcon>{{item.icon}}</mat-icon>
+              <a [routerLink]="item.link" routerLinkActive="active" matLine>{{item.linkTitle}}</a>
+          </mat-list-item>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

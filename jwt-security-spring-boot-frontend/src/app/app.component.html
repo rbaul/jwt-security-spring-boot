@@ -1,0 +1,9 @@
+<div *ngIf="!isLoggedIn$; else other">
+  <router-outlet></router-outlet>
+</div>
+
+<ng-template #other>
+  <app-navbar></app-navbar>
+</ng-template>
+
+

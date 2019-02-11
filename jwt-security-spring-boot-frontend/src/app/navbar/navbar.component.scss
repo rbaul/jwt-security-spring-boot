@@ -1,0 +1,38 @@
+.example-fill-remaining-space {
+    /* This fills the remaining space, by using flexbox. 
+       Every toolbar row uses a flexbox row layout. */
+    flex: 1 1 auto;
+}
+
+// .active {
+//    color: #673AB7;
+//    font-weight: bold!important;
+// }
+
+.mat-drawer-inner-container {
+   background-color: #3f51b5;
+}
+
+.example-sidenav {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 200px;
+   background-color: #3f51b5;
+ }
+
+.example-item {
+   color: rgb(211, 209, 209);
+   .active {
+      color: white;
+      font-weight: bold!important;
+   }
+   &:hover {
+      // color: black;
+      background-color: #212a5e;
+   }
+}
+
+mat-sidenav-container {
+   height: 93vh;
+}
