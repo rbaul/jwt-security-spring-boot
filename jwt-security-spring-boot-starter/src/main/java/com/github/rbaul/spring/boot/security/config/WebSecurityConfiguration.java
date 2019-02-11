@@ -26,7 +26,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()
-                .antMatchers("/user/login").permitAll()
+                .antMatchers("/api/security/login").permitAll()
                 // Disallow everything else..
                 .anyRequest().authenticated();
 
@@ -57,8 +57,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(JwtSecurityProperties jwtSecurityProperties) {
-        return new BCryptPasswordEncoder(jwtSecurityProperties.getToken().getPasswordStrength());
+    public PasswordEncoder passwordEncoder(JwtSecurityProperties.JwtSecurityTokenProperties jwtSecurityTokenProperties) {
+        return new BCryptPasswordEncoder(jwtSecurityTokenProperties.getPasswordStrength());
     }
 
 }

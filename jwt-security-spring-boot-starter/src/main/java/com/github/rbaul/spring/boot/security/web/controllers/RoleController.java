@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 @RestController
-@RequestMapping("role")
+@RequestMapping("api/role")
 public class RoleController {
 
     private final RoleService roleService;

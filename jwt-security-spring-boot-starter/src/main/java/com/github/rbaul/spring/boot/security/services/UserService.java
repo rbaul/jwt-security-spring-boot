@@ -4,6 +4,7 @@ import com.github.rbaul.spring.boot.security.domain.model.Role;
 import com.github.rbaul.spring.boot.security.domain.model.User;
 import com.github.rbaul.spring.boot.security.domain.repository.RoleRepository;
 import com.github.rbaul.spring.boot.security.domain.repository.UserRepository;
+import com.github.rbaul.spring.boot.security.web.dtos.LoginResponseDto;
 import com.github.rbaul.spring.boot.security.web.dtos.SignUpDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,19 +41,23 @@ public class UserService {
      * @param password  password
      * @return Optional of the Java Web Token, empty otherwise
      */
-    public Optional<String> signin(String username, String password) {
+    public Optional<LoginResponseDto> signin(String username, String password) {
         log.info("New user attempting to sign in");
-        Optional<String> token = Optional.empty();
+        Optional<LoginResponseDto> loginResponse = Optional.empty();
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             try {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-                token = Optional.of(jwtProvider.createToken(username, user.get().getRoles()));
+                String token = jwtProvider.createToken(username, user.get().getRoles());
+                loginResponse = Optional.of(LoginResponseDto.builder()
+                        .username(username)
+                        .isAuthenticated(true)
+                        .bearerToken(token).build());
             } catch (AuthenticationException e){
                 log.info("Log in failed for user {}", username);
             }
         }
-        return token;
+        return loginResponse;
     }
 
     /**

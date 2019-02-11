@@ -12,5 +12,5 @@ node {
 jar.dependsOn 'npm_run_build'
 
 jar {
-    from 'spring-boot-web-socket-frontend' into 'static'
+    from 'jwt-security-spring-boot-frontend' into 'static'
 }

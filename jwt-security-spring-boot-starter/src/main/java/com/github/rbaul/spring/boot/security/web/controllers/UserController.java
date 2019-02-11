@@ -2,7 +2,6 @@ package com.github.rbaul.spring.boot.security.web.controllers;
 
 import com.github.rbaul.spring.boot.security.domain.model.User;
 import com.github.rbaul.spring.boot.security.services.UserService;
-import com.github.rbaul.spring.boot.security.web.dtos.LoginDto;
 import com.github.rbaul.spring.boot.security.web.dtos.SignUpDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,16 +17,10 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 @RestController
-@RequestMapping("user")
+@RequestMapping("api/user")
 public class UserController {
 
     private final UserService userService;
-
-    @PostMapping("login")
-    public String login(@RequestBody @Valid LoginDto loginDto) {
-       return userService.signin(loginDto.getUsername(), loginDto.getPassword())
-               .orElseThrow(() -> new HttpServerErrorException(HttpStatus.FORBIDDEN, "Login Failed"));
-    }
 
     @PostMapping("signup")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

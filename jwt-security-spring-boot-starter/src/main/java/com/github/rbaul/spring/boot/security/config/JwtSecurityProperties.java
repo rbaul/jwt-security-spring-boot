@@ -35,11 +35,11 @@ public class JwtSecurityProperties {
     @EnableConfigurationProperties
     public static class JwtSecurityTokenProperties {
         private String rolesKey = "roles";
-        private String secretKey = "default-secret-key-for-encryption";
-        private long expiration = 60000;
-        private String headerName = "bearer";
+        private String secretKey = "secret-key-for-encryption";
+        private long expiration = 600000; // 10 minutes
+        private String headerName = "Authorization";
         private int passwordStrength = 12;
-        private String prefix = "";
+        private String prefix = "Bearer";
     }
 
     @Getter
