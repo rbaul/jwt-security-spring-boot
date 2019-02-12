@@ -28,6 +28,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 
 	implementation(project(':jwt-security-spring-boot-starter'))
+	implementation(project(':jwt-security-spring-boot-frontend'))
 
 	//swagger
 	implementation('io.springfox:springfox-swagger2:2.9.2')
