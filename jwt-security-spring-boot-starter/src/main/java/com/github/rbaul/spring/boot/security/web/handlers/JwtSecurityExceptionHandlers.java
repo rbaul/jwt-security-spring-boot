@@ -26,7 +26,7 @@ import java.util.Map;
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
-public class GlobalExceptionHandlers {
+public class JwtSecurityExceptionHandlers {
 
     @Bean
     public ErrorAttributes errorAttributes() {
