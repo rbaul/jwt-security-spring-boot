@@ -28,19 +28,19 @@ import java.util.Map;
 @RestControllerAdvice
 public class JwtSecurityExceptionHandlers {
 
-    @Bean
-    public ErrorAttributes errorAttributes() {
-        // Hide exception field in the return object
-        return new DefaultErrorAttributes() {
-
-            @Override
-            public Map<String, Object> getErrorAttributes(WebRequest requestAttributes, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
-                errorAttributes.remove("exception");
-                return errorAttributes;
-            }
-        };
-    }
+//    @Bean
+//    public ErrorAttributes errorAttributes() {
+//        // Hide exception field in the return object
+//        return new DefaultErrorAttributes() {
+//
+//            @Override
+//            public Map<String, Object> getErrorAttributes(WebRequest requestAttributes, boolean includeStackTrace) {
+//                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
+//                errorAttributes.remove("exception");
+//                return errorAttributes;
+//            }
+//        };
+//    }
 
     @ExceptionHandler(AccessDeniedException.class)
     public void handleAccessDeniedException(AccessDeniedException ex, HttpServletResponse res) throws IOException {
