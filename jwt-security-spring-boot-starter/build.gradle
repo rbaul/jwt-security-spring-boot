@@ -31,7 +31,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
+	implementation('org.springframework.boot:spring-boot-starter')
+
+	compileOnly 'org.projectlombok:lombok:1.18.4'
+	implementation('org.springframework.boot:spring-boot-configuration-processor')
+
+	annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
+	annotationProcessor('org.projectlombok:lombok:1.18.4')
 
 	// JSON Web Token Support
 	implementation 'io.jsonwebtoken:jjwt:0.7.0'
@@ -42,3 +48,5 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
+
+compileJava.dependsOn(processResources)

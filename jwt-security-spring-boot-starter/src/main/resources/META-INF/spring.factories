@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.rbaul.spring.boot.security.config.JwtSecurityAutoConfiguration
+com.github.rbaul.spring.boot.security.JwtSecurityAutoConfiguration
