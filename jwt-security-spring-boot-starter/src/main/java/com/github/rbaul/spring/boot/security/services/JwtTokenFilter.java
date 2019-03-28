@@ -37,7 +37,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("Process request to check for a JSON Web Token ");
         //Check for Authorization:Bearer JWT
         String headerValue = request.getHeader(jwtSecurityProperties.getToken().getHeaderName());
         getBearerToken(headerValue).ifPresent(token-> {

@@ -26,9 +26,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()
-                .antMatchers("/api/security/login").permitAll()
+                .antMatchers("/api/security/login").permitAll();
                 // Disallow everything else..
-                .anyRequest().authenticated();
+//                .anyRequest().authenticated();
 
         // Disable CSRF (cross site request forgery)
         http.csrf().disable();

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class ProductController {
     @ApiResponses({@ApiResponse(code = 200, message = "Retrieved All Product")})
     @ResponseStatus(code = HttpStatus.OK)
     @GetMapping("all")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" )
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public List<ProductDto> getAllProduct() {
         return productService.getAll();
     }
@@ -56,7 +57,7 @@ public class ProductController {
             @ApiResponse(code = 428, message = "Invalid Product info", response = ErrorDto.class)})
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping
-    @PreAuthorize("hasyRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ProductDto create(
             @ApiParam(value = "Product object that needs to be create", name = "ProductDto", required = true)
             @Validated(ValidationGroups.Create.class) @RequestBody ProductDto productDto) {
