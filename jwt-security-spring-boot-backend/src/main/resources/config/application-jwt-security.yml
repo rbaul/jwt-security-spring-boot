@@ -1,6 +1,6 @@
-#security.jwt:
-#  token:
-#    expiration: 600000
+security.jwt:
+  token:
+    expiration: 60000
 #    secret-key: secret-key-for-encryption
 #    roles-key: roles
 #    header-name: Authorization

@@ -22,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Slf4j
@@ -45,7 +46,9 @@ public class ProductController {
     @ApiResponses({@ApiResponse(code = 200, message = "Retrieved All Product")})
     @ResponseStatus(code = HttpStatus.OK)
     @GetMapping("all")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" )
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
+//    @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
     public List<ProductDto> getAllProduct() {
         return productService.getAll();
     }

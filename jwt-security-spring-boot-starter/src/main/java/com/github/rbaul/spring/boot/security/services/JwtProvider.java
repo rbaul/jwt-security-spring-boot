@@ -2,20 +2,16 @@ package com.github.rbaul.spring.boot.security.services;
 
 import com.github.rbaul.spring.boot.security.config.JwtSecurityProperties;
 import com.github.rbaul.spring.boot.security.domain.model.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.github.rbaul.spring.boot.security.domain.model.User;
+import com.github.rbaul.spring.boot.security.domain.repository.UserRepository;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,6 +21,9 @@ public class JwtProvider{
     private String secretKey;
     private long validityInMilliseconds;
     private String rolesKey;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     public JwtProvider(JwtSecurityProperties.JwtSecurityTokenProperties jwtSecurityTokenProperties) {
@@ -65,6 +64,14 @@ public class JwtProvider{
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            log.debug("Token expired");
+            String username = getUsername(token);
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("User not exist"));
+//            user.ge
+            // TODO: update time
+            return false;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
