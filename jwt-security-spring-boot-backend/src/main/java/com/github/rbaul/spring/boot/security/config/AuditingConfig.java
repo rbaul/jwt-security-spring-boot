@@ -18,7 +18,7 @@ public class AuditingConfig {
         return () -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()
-                    || authentication.getPrincipal() instanceof UserDetails) {
+                    || !(authentication.getPrincipal() instanceof UserDetails)) {
                 return Optional.of("anonymousUser");
             }
 
