@@ -1,24 +1,18 @@
 package com.github.rbaul.spring.boot.security.web.handlers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Handle all Exceptions in for All controllers
@@ -42,26 +36,29 @@ public class JwtSecurityExceptionHandlers {
 //        };
 //    }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(AccessDeniedException.class)
-    public void handleAccessDeniedException(AccessDeniedException ex, HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
+    public String handleAccessDeniedException(AccessDeniedException ex) {
+        return ex.getMessage();
     }
 
     @ExceptionHandler(HttpServerErrorException.class)
     public void handleHttpServerErrorException(HttpServerErrorException ex, HttpServletResponse res) throws IOException {
-        res.sendError(ex.getStatusCode().value(),ex.getMessage());
+        res.sendError(ex.getStatusCode().value(), ex.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(InsufficientAuthenticationException.class)
-    public void handleInsufficientAuthenticationException(InsufficientAuthenticationException ex, HttpServletResponse res) throws IOException {
+    public String handleInsufficientAuthenticationException(InsufficientAuthenticationException ex) {
         log.error("Handled Insufficient Authentication Exception", ex);
-        res.sendError(HttpStatus.FORBIDDEN.value(), "Insufficient Authentication");
+        return "Insufficient Authentication";
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public void handleException(Exception ex, HttpServletResponse res) throws IOException {
+    public String handleException(Exception ex) {
         log.error("Handled Internal Error Exception", ex);
-        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Something went wrong");
+        return "Something went wrong";
     }
 
 }

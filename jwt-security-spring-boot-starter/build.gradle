@@ -39,6 +39,9 @@ dependencies {
 	annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
 	annotationProcessor('org.projectlombok:lombok:1.18.4')
 
+	// modelmapper
+	implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.0'
+
 	// JSON Web Token Support
 	implementation 'io.jsonwebtoken:jjwt:0.7.0'
 

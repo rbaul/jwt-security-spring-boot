@@ -1,7 +1,6 @@
 package com.github.rbaul.spring.boot.security.services;
 
 import com.github.rbaul.spring.boot.security.config.JwtSecurityProperties;
-import com.github.rbaul.spring.boot.security.domain.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JwtProvider{
+public class JwtProvider {
 
     private String secretKey;
     private long validityInMilliseconds;
@@ -34,17 +33,15 @@ public class JwtProvider{
     }
 
     /**
-     * Create JWT string given username and roles.
+     * Create JWT string given username and granted authorities.
      *
      * @param username
-     * @param roles
+     * @param grantedAuthorities
      * @return jwt string
      */
-    public String createToken(String username, List<Role> roles) {
+    public String createToken(String username, List<GrantedAuthority> grantedAuthorities) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put(rolesKey, roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
-                .collect(Collectors.toList()));
+        claims.put(rolesKey, grantedAuthorities);
         Date now = new Date();
         Date expiresAt = new Date(now.getTime() + validityInMilliseconds);
         return Jwts.builder()
@@ -82,16 +79,28 @@ public class JwtProvider{
     }
 
     /**
+     * Get the Expiration time from the token string
+     *
+     * @param token jwt
+     * @return Expiration time
+     */
+    public Date getExpirationTime(String token) {
+        return Jwts.parser().setSigningKey(secretKey)
+                .parseClaimsJws(token).getBody().getExpiration();
+    }
+
+    /**
      * Get the roles from the token string
      *
      * @param token jwt
      * @return username
      */
-    public List<GrantedAuthority> getRoles(String token) {
-        List<Map<String, String>>  roleClaims = Jwts.parser().setSigningKey(secretKey)
+    public List<GrantedAuthority> getGrantedAuthorities(String token) {
+        List<Map<String, String>> roleClaims = Jwts.parser().setSigningKey(secretKey)
                 .parseClaimsJws(token).getBody().get(rolesKey, List.class);
         return roleClaims.stream().map(roleClaim ->
                 new SimpleGrantedAuthority(roleClaim.get("authority")))
                 .collect(Collectors.toList());
     }
+
 }

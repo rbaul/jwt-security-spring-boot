@@ -17,8 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableGlobalMethodSecurity(
         prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
+        securedEnabled = true
+)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -30,7 +30,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Entry points
         http.authorizeRequests()
                 .antMatchers("/api/security/login").permitAll();
-                // Disallow everything else..
+        // Disallow everything else..
 //                .anyRequest().authenticated();
 
         // Disable CSRF (cross site request forgery)

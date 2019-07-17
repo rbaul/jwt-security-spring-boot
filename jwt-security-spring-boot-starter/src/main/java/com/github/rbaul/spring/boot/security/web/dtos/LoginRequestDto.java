@@ -11,19 +11,12 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Builder
 @ToString
-public class SignUpDto {
+public class LoginRequestDto {
+    @NotNull
     @NotEmpty
     private String username;
 
     @NotNull
+    @NotEmpty
     private String password;
-
-    @NotEmpty
-    private String firstName;
-
-    @NotEmpty
-    private String lastName;
-
-    @NotEmpty
-    private String role;
 }

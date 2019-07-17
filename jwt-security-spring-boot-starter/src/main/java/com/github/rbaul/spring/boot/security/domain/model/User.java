@@ -2,9 +2,11 @@ package com.github.rbaul.spring.boot.security.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -36,6 +38,15 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private List<Role> roles;
+    private Collection<Role> roles;
+
+    public void setRoles(Collection<Role> roles) {
+        if (CollectionUtils.isEmpty(roles)) {
+            roles = new ArrayList<>();
+        }
+        this.roles.forEach(role -> role.removeUser(this));
+        roles.forEach(role -> role.addUser(this));
+        this.roles = roles;
+    }
 
 }
