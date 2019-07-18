@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,8 +42,6 @@ public class UserService {
 
     private final JwtProvider jwtProvider;
 
-    private final DefaultUserDetailsService defaultUserDetailsService;
-
     private final ModelMapper modelMapper;
 
     /**
@@ -54,21 +52,20 @@ public class UserService {
      * @return Optional of the Java Web Token, empty otherwise
      */
     @Transactional(readOnly = true)
-    public LoginResponseDto signin(String username, String password) {
+    public LoginResponseDto login(String username, String password) {
         log.info("Username '{}' attempting to sign in", username);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EmptyResultDataAccessException("No found user with username: " + username, 1));
-        List<String> privileges = defaultUserDetailsService.getPrivileges(user.getRoles());
-        List<GrantedAuthority> grantedAuthorities = defaultUserDetailsService.getGrantedAuthorities(privileges);
-        String token = jwtProvider.createToken(username, grantedAuthorities);
+        Set<String> privilegeNames = user.getPrivilegeNames();
+        Set<String> roleNames = user.getRoleNames();
+        String token = jwtProvider.createToken(username, roleNames, privilegeNames);
         Date expirationTime = jwtProvider.getExpirationTime(token);
         return LoginResponseDto.builder()
-                .username(username)
                 .isAuthenticated(true)
                 .bearerToken(token)
-                .claims(privileges)
-                .expiredAt(expirationTime).build();
+                .expiredAt(expirationTime)
+                .build();
     }
 
     /**

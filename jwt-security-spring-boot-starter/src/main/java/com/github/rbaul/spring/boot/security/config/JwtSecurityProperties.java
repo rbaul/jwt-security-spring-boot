@@ -40,7 +40,6 @@ public class JwtSecurityProperties {
                 .name(administrator.getRoleName())
                 .description(administrator.getRoleDescription())
                 .privileges(privileges.stream().map(JwtSecurityPrivilegeProperties::getName).collect(Collectors.toList())).build());
-
     }
 
     @Getter
@@ -51,12 +50,24 @@ public class JwtSecurityProperties {
     @ConfigurationProperties(prefix = "security.jwt.token")
     @EnableConfigurationProperties
     public static class JwtSecurityTokenProperties {
-        private String rolesKey = "roles";
+        private JwtSecurityTokenClaimsProperties claims = new JwtSecurityTokenClaimsProperties();
         private String secretKey = "secret-key-for-encryption";
         private long expiration = 600000; // 10 minutes
         private String headerName = "Authorization";
         private int passwordStrength = 12;
         private String prefix = "Bearer";
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ConfigurationProperties(prefix = "security.jwt.token.claims")
+    @EnableConfigurationProperties
+    public static class JwtSecurityTokenClaimsProperties {
+        private String rolesKey = "roles";
+        private String privilegesKey = "privileges";
     }
 
     @Getter

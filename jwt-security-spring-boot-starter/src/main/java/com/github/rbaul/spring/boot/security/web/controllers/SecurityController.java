@@ -25,7 +25,7 @@ public class SecurityController {
     @ApiOperation(value = "Login")
     @PostMapping("login")
     public LoginResponseDto login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
-        return userService.signin(loginRequestDto.getUsername(), loginRequestDto.getPassword());
+        return userService.login(loginRequestDto.getUsername(), loginRequestDto.getPassword());
     }
 
 }

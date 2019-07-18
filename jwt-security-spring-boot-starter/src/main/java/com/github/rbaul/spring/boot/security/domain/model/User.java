@@ -3,10 +3,14 @@ package com.github.rbaul.spring.boot.security.domain.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -47,6 +51,29 @@ public class User {
         this.roles.forEach(role -> role.removeUser(this));
         roles.forEach(role -> role.addUser(this));
         this.roles = roles;
+    }
+
+    public Set<Privilege> getPrivileges() {
+        if (!StringUtils.isEmpty(roles)) {
+            return roles.stream()
+                    .map(Role::getPrivileges)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
+        } else {
+            return new HashSet<>();
+        }
+    }
+
+    public Set<String> getPrivilegeNames() {
+        return getPrivileges().stream()
+                .map(Privilege::getAuthority)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<String> getRoleNames() {
+        return getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
     }
 
 }

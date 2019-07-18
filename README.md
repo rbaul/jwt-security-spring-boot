@@ -45,13 +45,15 @@ compile 'com.github.rbaul:jwt-security-spring-boot-starter:0.0.2-SNAPSHOT'
 > Privilege must have prefix `ROLE_`
 ```yaml
 security.jwt:
-  #  token:
-  #    expiration: 600000
-  #    secret-key: secret-key-for-encryption
-  #    roles-key: roles
-  #    header-name: Authorization
-  #    password-strength: 7
-  #    prefix: Bearer
+#    token:
+#      expiration: 600000
+#      secret-key: secret-key-for-encryption
+#      header-name: Authorization
+#      password-strength: 7
+#      prefix: Bearer
+#      claims:
+#        roles-key: roles
+#        privilege-key: privileges
   roles:
     - name: Viewer
       description: View user
