@@ -18,6 +18,7 @@ import { UsersComponent } from './users/users.component';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import { ProductDialogComponent } from './products/product-dialog/product-dialog.component';
 import { HasPrivilegeDirective } from './security/has-privilege.directive';
+import { ParticleComponent } from './shared/particle/particle.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { HasPrivilegeDirective } from './security/has-privilege.directive';
     UsersComponent,
     ConfirmationDialogComponent,
     ProductDialogComponent,
-    HasPrivilegeDirective
+    HasPrivilegeDirective,
+    ParticleComponent
   ],
   imports: [
     CommonModule,
