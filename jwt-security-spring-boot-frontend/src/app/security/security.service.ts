@@ -81,7 +81,7 @@ export class SecurityService {
   }
 
   public hasPrivilege(privileges: String[]): boolean {
-    return privileges ? this.securityObject.privileges.some(privilege => privileges.includes(privilege)) : true;
+    return privileges ? this.securityObject.privileges.some(privilege => privileges.indexOf(privilege) > -1) : true;
   }
 
   private getTokenObject(tokenString: string): UserAuth {
