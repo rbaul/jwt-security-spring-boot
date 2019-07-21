@@ -1,25 +1,55 @@
 import { Injectable, NgModule } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler,
-         HttpRequest } from '@angular/common/http';
+         HttpRequest,
+         HttpErrorResponse} from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { SecurityService } from './security.service';
+import { Router } from '@angular/router';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
+
+  constructor(
+    private router: Router,
+    private securityService: SecurityService
+  ) { }
+
   intercept(req: HttpRequest<any>, next: HttpHandler):
     Observable<HttpEvent<any>> {
     const token = localStorage.getItem('bearerToken');
 
     if (token) {
-      const newReq = req.clone(
-        {
+      req = req.clone({
            headers: req.headers.set('Authorization', 'Bearer ' + token)
-        });
-
-        return next.handle(newReq);
-    } else {
-      return next.handle(req);
+      });
     }
+
+    return next.handle(req).pipe(
+      map((event: HttpEvent<any>) => {
+        // if (event instanceof HttpResponse) {
+            // console.log('event--->>>', event);
+            // this.errorDialogService.openDialog(event);
+        // }
+        return event;
+    }),
+    catchError((error: HttpErrorResponse) => {
+        let data = {};
+        data = {
+            reason: error && error.error.reason ? error.error.reason : '',
+            status: error.status
+        };
+        if (error.status === 401 || error.status === 403) {
+          // this.errorDialogService.openDialog(data);
+          this.securityService.logoutProccess();
+          this.router.navigateByUrl(`/login`);
+        }
+
+        return throwError(error);
+    })
+    );
+
   }
 }
 
@@ -27,7 +57,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   providers: [
     { provide: HTTP_INTERCEPTORS,
       useClass: HttpRequestInterceptor,
-      multi: true }
+      multi: true,
+      deps: [Router, SecurityService]
+    }
   ]
 })
 export class HttpInterceptorModule { }

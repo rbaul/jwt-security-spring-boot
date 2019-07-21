@@ -9,3 +9,4 @@ export class Product {
 export enum ProductState {
     SOLD_OUT, SALE, REGULAR, COMING_SOON
 }
+

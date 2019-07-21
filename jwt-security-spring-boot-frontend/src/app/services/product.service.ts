@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../products/models/product';
+import { Page } from '../models/page';
 
-const API_URL = '/api/product/';
+const API_URL = '/api/products/';
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type': 'application/json'
@@ -17,12 +18,12 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  getProducts(): Observable<Product[]> {
+  getAllProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(API_URL);
   }
 
-  getAllProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(API_URL + 'all');
+  getPageableProducts(): Observable<Page<Product>> {
+    return this.http.get<Page<Product>>(API_URL + 'pageable');
   }
 
   getProduct(id: number): Observable<Product> {

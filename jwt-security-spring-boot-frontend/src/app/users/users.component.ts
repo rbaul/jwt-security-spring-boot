@@ -25,8 +25,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
     ) { }
 
   ngOnInit() {
-    this.userApiService.getAllUsers().subscribe(users => {
-      this.dataSource.data = users;
+    this.userApiService.getPageableUsers().subscribe(users => {
+      this.dataSource.data = users.content;
     });
   }
 

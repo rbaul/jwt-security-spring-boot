@@ -2,9 +2,12 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+import { JwtHelperService } from '@auth0/angular-jwt';
+
 import { User } from './models/user';
-import { UserAuth } from './models/user-auth';
+import { UserAuth, UserAuthResponse } from './models/user-auth';
 import { SecurityApiService } from '../services/security-api.service';
+import { Token } from './models/token';
 
 @Injectable({
     providedIn: 'root'
@@ -16,17 +19,16 @@ export class SecurityService {
   private loggedUser: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private securityApi: SecurityApiService) {
-    const token = localStorage.getItem('bearerToken');
-    const username = localStorage.getItem('username');
+    const token: string = localStorage.getItem('bearerToken');
 
-    if (token && username) {
-        this.securityObject.username = username;
-        this.securityObject.bearerToken = token;
-        this.securityObject.authenticated = true;
-        this.securityObject.claims = [];
-        this.loggedUser.next(this.securityObject.username);
-        this.loggedIn.next(true);
+    const securityObject: UserAuth = this.getTokenObject(token);
+    if (securityObject) {
+      Object.assign(this.securityObject, securityObject);
+      this.loginProccess();
+    } else {
+      this.logoutProccess();
     }
+
   }
 
   get loggedUserIn() {
@@ -37,25 +39,32 @@ export class SecurityService {
     return this.loggedIn.asObservable();
   }
 
-  login(user: User): Observable<UserAuth> {
+  login(user: User): Observable<UserAuthResponse> {
     // Initialize security object
     this.resetSecurityObject();
 
     return this.securityApi.login(user).pipe(
         tap(resp => {
-            // Use object assign to update the current object
-            // NOTE: Don't create a new AppUserAuth object
-            //       because that destroys all references to object
-            Object.assign(this.securityObject, resp);
-            // Store into local storage
-            localStorage.setItem('bearerToken', this.securityObject.bearerToken);
-            localStorage.setItem('username', this.securityObject.username);
-            this.loggedUser.next(this.securityObject.username);
-            this.loggedIn.next(true);
-    }));
+          const tokenObject: UserAuth = this.getTokenObject(resp.bearerToken);
+
+          // Use object assign to update the current object
+          // NOTE: Don't create a new AppUserAuth object
+          //       because that destroys all references to object
+          Object.assign(this.securityObject, tokenObject);
+
+          // Store into local storage
+          localStorage.setItem('bearerToken', this.securityObject.bearerToken);
+          this.loginProccess();
+        })
+    );
   }
 
-  logout(): void {
+  loginProccess(): void {
+    this.loggedUser.next(this.securityObject.username);
+    this.loggedIn.next(true);
+  }
+
+  logoutProccess(): void {
     this.resetSecurityObject();
     this.loggedUser.next('');
     this.loggedIn.next(false);
@@ -65,64 +74,40 @@ export class SecurityService {
     this.securityObject.username = '';
     this.securityObject.bearerToken = '';
     this.securityObject.authenticated = false;
-
-    this.securityObject.claims = [];
+    this.securityObject.roles = [];
+    this.securityObject.privileges = [];
 
     localStorage.removeItem('bearerToken');
-    localStorage.removeItem('username');
   }
 
-  // This method can be called a couple of different ways
-  // *hasClaim="'claimType'"  // Assumes claimValue is true
-  // *hasClaim="'claimType:value'"  // Compares claimValue to value
-  // *hasClaim="['claimType1','claimType2:value','claimType3']"
-  hasClaim(claimType: any, claimValue?: any) {
-    let ret: boolean = false;
-
-    // See if an array of values was passed in.
-    if (typeof claimType === 'string') {
-      ret = this.isClaimValid(claimType, claimValue);
-    } else {
-      const claims: string[] = claimType;
-      if (claims) {
-        for (let index = 0; index < claims.length; index++) {
-          ret = this.isClaimValid(claims[index]);
-          // If one is successful, then let them in
-          if (ret) {
-            break;
-          }
-        }
-      }
-    }
-
-    return ret;
+  public hasPrivilege(privileges: String[]): boolean {
+    return privileges ? this.securityObject.privileges.some(privilege => privileges.includes(privilege)) : true;
   }
 
+  private getTokenObject(tokenString: string): UserAuth {
 
-  private isClaimValid(claimType: string, claimValue?: string): boolean {
-    let ret: boolean = false;
-    let auth: UserAuth = null;
+    try {
+      const jwtParser = new JwtHelperService();
+      const tokenObject: Token = jwtParser.decodeToken(tokenString);
 
-    // Retrieve security object
-    auth = this.securityObject;
-    if (auth) {
-      // See if the claim type has a value
-      // *hasClaim="'claimType:value'"
-      if (claimType.indexOf(':') >= 0) {
-        const words: string[] = claimType.split(':');
-        claimType = words[0].toLowerCase();
-        claimValue = words[1];
+      if (tokenObject) {
+        const securityObject: UserAuth = new UserAuth();
+
+        securityObject.username = tokenObject.sub;
+        securityObject.bearerToken = tokenString;
+        securityObject.authenticated = true;
+        securityObject.roles = tokenObject.roles;
+        securityObject.privileges = tokenObject.privileges;
+        securityObject.exp = tokenObject.exp;
+
+        return securityObject;
       } else {
-        claimType = claimType.toLowerCase();
-        // Either get the claim value, or assume 'true'
-        claimValue = claimValue ? claimValue : 'true';
+        return undefined;
       }
-      // Attempt to find the claim
-      ret = auth.claims.find(c =>
-        c.claimType.toLowerCase() === claimType &&
-        c.claimValue === claimValue) != null;
+    } catch (e) {
+      console.error(e);
+      return undefined;
     }
-
-    return ret;
   }
+
 }

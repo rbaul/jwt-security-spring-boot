@@ -3,7 +3,7 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { User } from '../security/models/user';
 import { Observable } from 'rxjs';
 import { SignUp } from '../security/models/singup';
-import { UserAuth } from '../security/models/user-auth';
+import { UserAuthResponse } from '../security/models/user-auth';
 
 
 const API_URL = '/api/security/';
@@ -22,8 +22,8 @@ export class SecurityApiService {
     private http: HttpClient
   ) { }
 
-  public login(user: User): Observable<UserAuth> {
-    return this.http.post<UserAuth>(API_URL + 'login', user, httpOptions);
+  public login(user: User): Observable<UserAuthResponse> {
+    return this.http.post<UserAuthResponse>(API_URL + 'login', user, httpOptions);
   }
 
 }

@@ -7,8 +7,9 @@ import { UsersComponent } from './users/users.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent},
-  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] },
-  { path: 'products', component: ProductsComponent, canActivate: [AuthGuard] },
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard], data: {privileges: ['ROLE_ADMIN_PRIVILEGE']} },
+  { path: 'products', component: ProductsComponent, canActivate: [AuthGuard],
+   data: {privileges: ['ROLE_VIEW_PRIVILEGE', 'ROLE_CHANGE_PRIVILEGE']} },
   { path: '', redirectTo: 'products', pathMatch: 'full'},
   { path: '**', redirectTo: 'login'}
 ];

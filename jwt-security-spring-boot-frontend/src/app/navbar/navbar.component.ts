@@ -14,8 +14,9 @@ export class NavbarComponent implements OnInit {
 
   loggedUser: string;
 
+
   listItems = [
-    { linkTitle: 'User Manager', link: '/users', icon: 'people' },
+    { linkTitle: 'User Manager', link: '/users', icon: 'people', privileges: ['ROLE_ADMIN_PRIVILEGE'] },
     { linkTitle: 'Product', link: '/products', icon: 'home' }
   ];
 
@@ -28,6 +29,7 @@ export class NavbarComponent implements OnInit {
     this.securityService.loggedUserIn.subscribe(username => {
       this.loggedUser = username;
     });
+    this.listItems = this.listItems.filter(item => this.securityService.hasPrivilege(item.privileges));
   }
 
   handleClick(selectedItem) {
@@ -35,7 +37,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    this.securityService.logout();
+    this.securityService.logoutProccess();
     this.router.navigate(['/login']);
   }
 }

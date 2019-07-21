@@ -14,13 +14,14 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     // Get property name on security object to check
-    const claimType: string = next.data['claimType'];
+    const privileges: String[] = next.data['privileges'];
 
     if (this.securityService.securityObject.authenticated
-    //   && this.securityService.hasClaim(claimType)
+      && this.securityService.hasPrivilege(privileges)
       ) {
       return true;
     } else {
+      this.securityService.logoutProccess();
       this.router.navigate(['login'],
         { queryParams: { returnUrl: state.url } });
       return false;

@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   submitted = false;
   returnUrl: string;
 
-  securityObject: UserAuth = null;
+  errorMessage: string;
 
   constructor(
     private fb: FormBuilder,
@@ -48,17 +48,17 @@ export class LoginComponent implements OnInit {
         return;
     }
 
+    this.errorMessage = '';
+
     this.loading = true;
     this.securityService.login(new User(this.f.username.value, this.f.password.value))
       .subscribe(resp => {
-        this.securityObject = resp;
         if (this.returnUrl) {
           this.router.navigateByUrl(this.returnUrl);
         }
       },
-        () => {
-          // Initialize security object to display error message
-          this.securityObject = new UserAuth();
+        (error) => {
+          this.errorMessage = 'Invalid Username or Password';
     });
   }
 

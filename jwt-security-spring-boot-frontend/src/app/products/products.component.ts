@@ -26,8 +26,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     ) { }
 
   ngOnInit() {
-    this.productApiService.getAllProducts().subscribe(products => {
-      this.dataSource.data = products;
+    this.productApiService.getPageableProducts().subscribe(products => {
+      this.dataSource.data = products.content;
     });
   }
 

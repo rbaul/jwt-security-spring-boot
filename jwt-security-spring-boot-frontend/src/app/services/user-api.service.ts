@@ -4,9 +4,10 @@ import { User } from '../security/models/user';
 import { Observable } from 'rxjs';
 import { SignUp } from '../security/models/singup';
 import { UserAuth } from '../security/models/user-auth';
+import { Page } from '../models/page';
 
 
-const API_URL = '/api/user/';
+const API_URL = '/api/users/';
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type': 'application/json'
@@ -32,6 +33,10 @@ export class UserApiService {
 
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(API_URL, httpOptions);
+  }
+
+  getPageableUsers(): Observable<Page<User>> {
+    return this.http.get<Page<User>>(API_URL + 'pageable');
   }
 
   getUser(userId: number): Observable<User> {
