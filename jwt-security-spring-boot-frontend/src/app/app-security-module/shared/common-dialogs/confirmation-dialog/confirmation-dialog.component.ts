@@ -21,10 +21,6 @@ export class ConfirmationDialogComponent implements OnInit {
   ngOnInit() {
   }
 
-  ok() {
-    this.dialogRef.close(true);
-  }
-
 }
 
 export interface ConfirmationDialogData {

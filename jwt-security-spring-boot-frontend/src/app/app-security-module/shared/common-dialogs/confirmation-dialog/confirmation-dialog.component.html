@@ -8,6 +8,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button class="mat-raised-button mat-primary" (click)="ok()" cdkFocusInitial>{{data.okName}}</button>
+    <button class="mat-raised-button mat-primary" mat-dialog-close="true" cdkFocusInitial>{{data.okName}}</button>
     <button class="mat-raised-button" mat-dialog-close>Close</button>
 </mat-dialog-actions>
