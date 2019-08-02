@@ -56,7 +56,7 @@ public class RoleUpdateRequestDtoValidator implements Validator {
     private void validateUniqueRoleName(RoleUpdateRequestDto roleUpdateRequestDto, Errors errors) {
         Optional<Role> roleOptional = roleRepository.findByName(roleUpdateRequestDto.getName());
         boolean roleNameExist = roleRepository.existsByName(roleUpdateRequestDto.getName());
-        if (roleOptional.isPresent() && Objects.equals(roleOptional.get().getId(), roleUpdateRequestDto.getId())) {
+        if (roleOptional.isPresent() && !Objects.equals(roleOptional.get().getId(), roleUpdateRequestDto.getId())) {
             errors.rejectValue(RoleUpdateRequestDto.Fields.name, "Role already exist with same name: " + roleUpdateRequestDto.getName());
         }
     }

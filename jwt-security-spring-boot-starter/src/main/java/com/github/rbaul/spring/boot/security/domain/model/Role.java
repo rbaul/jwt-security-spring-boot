@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -15,13 +17,15 @@ import java.util.Collection;
 @Builder
 @Entity
 @Table(name = "security_role")
-public class Role {
+public class Role extends AuditableEntity {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @NotNull
+    @NotEmpty
+    @Column(name = "name", unique = true)
     private String name;
 
     @Column(name = "description")
@@ -54,8 +58,8 @@ public class Role {
     }
 
     public void setPrivileges(Collection<Privilege> privileges) {
-        if (CollectionUtils.isEmpty(privileges)) {
-            privileges = new ArrayList<>();
+        if (CollectionUtils.isEmpty(this.privileges)) {
+            this.privileges = new ArrayList<>();
         }
         this.privileges.forEach(privilege -> privilege.removeRole(this));
         privileges.forEach(privilege -> privilege.addRole(this));

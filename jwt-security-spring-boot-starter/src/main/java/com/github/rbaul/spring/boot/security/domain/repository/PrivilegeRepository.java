@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface PrivilegeRepository extends JpaRepository<Privilege, Long> {
@@ -14,7 +13,7 @@ public interface PrivilegeRepository extends JpaRepository<Privilege, Long> {
 
     Optional<Privilege> findByName(String name);
 
-    Set<Privilege> findByIdIn(Collection<Long> ids);
+    Collection<Privilege> findByIdIn(Collection<Long> ids);
 
     boolean existsByIdIn(Collection<Long> ids);
 }

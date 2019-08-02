@@ -12,37 +12,28 @@ export class ProductDialogComponent implements OnInit {
 
   form: FormGroup;
 
-  name: string;
-  description: string;
-  price: number;
-  state: ProductState;
-
-  productStates;
+  productStates: string[];
 
   constructor(
       private fb: FormBuilder,
       private dialogRef: MatDialogRef<ProductDialogComponent>,
       @Inject(MAT_DIALOG_DATA) data) {
 
-      this.name = data.name;
-      this.description = data.description;
-      this.price = data.price;
-      this.state = data.state;
+      this.productStates = this.enumSelector(ProductState);
+
+      this.form = this.fb.group({
+        name: [data.name, [Validators.required]],
+        description: [data.description, [Validators.required]],
+        price: [data.price, [Validators.required, Validators.min(0)]],
+        state: [data.state, [Validators.required]],
+      });
 
   }
 
   ngOnInit() {
-    this.productStates = this.enumSelector(ProductState);
-
-    this.form = this.fb.group({
-      name: [this.name, [Validators.required]],
-      description: [this.description, [Validators.required]],
-      price: [this.price, [Validators.required, Validators.min(0)]],
-      state: [this.state, [Validators.required]],
-    });
   }
 
-  enumSelector(someEnum) {
+  enumSelector(someEnum): string[] {
     return Object.keys(someEnum).filter(f => !isNaN(Number(f)))
               // .map(key => ({ id: someEnum[key], value: key }));
               .map(key =>  someEnum[key] );
@@ -50,10 +41,6 @@ export class ProductDialogComponent implements OnInit {
 
   save() {
       this.dialogRef.close(this.form.value);
-  }
-
-  close() {
-      this.dialogRef.close();
   }
 
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 @RestController
-@PreAuthorize("hasRole(@privilegeController.getRoleAdmin())")
+@PreAuthorize("hasRole(@administratorService.getPrivilegeName())")
 @RequestMapping("api/privileges")
 public class PrivilegeController {
 

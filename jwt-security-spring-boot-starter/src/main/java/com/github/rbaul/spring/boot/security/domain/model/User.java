@@ -1,11 +1,12 @@
 package com.github.rbaul.spring.boot.security.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,17 +21,20 @@ import java.util.stream.Collectors;
 @Builder
 @Entity
 @Table(name = "security_user")
-public class User {
+public class User extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username")
+    @NotNull
+    @NotEmpty
+    @Column(name = "username", unique = true)
     private String username;
 
+    @NotNull
+    @NotEmpty
     @Column(name = "password")
-    @JsonIgnore
     private String password;
 
     @Column(name = "first_name")
@@ -45,8 +49,8 @@ public class User {
     private Collection<Role> roles;
 
     public void setRoles(Collection<Role> roles) {
-        if (CollectionUtils.isEmpty(roles)) {
-            roles = new ArrayList<>();
+        if (CollectionUtils.isEmpty(this.roles)) {
+            this.roles = new ArrayList<>();
         }
         this.roles.forEach(role -> role.removeUser(this));
         roles.forEach(role -> role.addUser(this));

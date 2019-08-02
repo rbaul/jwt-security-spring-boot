@@ -63,7 +63,7 @@ public class RoleController {
         roleUpdateRequestDto.setId(roleId);
         roleUpdateRequestDtoValidator.validate(roleUpdateRequestDto, bindingResult);
         if (bindingResult.hasErrors()) {
-            MethodParameter roleUpdateRequestDtoParameter = new MethodParameter(this.getClass().getDeclaredMethod("updateRole", RoleUpdateRequestDto.class), 1);
+            MethodParameter roleUpdateRequestDtoParameter = new MethodParameter(this.getClass().getDeclaredMethod("updateRole", long.class, RoleUpdateRequestDto.class, BindingResult.class), 1);
             throw new MethodArgumentNotValidException(roleUpdateRequestDtoParameter, bindingResult);
         }
         return roleService.updateRole(roleId, roleUpdateRequestDto);

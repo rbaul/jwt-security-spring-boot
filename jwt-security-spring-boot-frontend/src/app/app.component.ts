@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { SecurityService } from './security/security.service';
+import { NavItem } from './app-security-module/models/nav-item';
+import { SecurityService } from './app-security-module/security/security.service';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +9,14 @@ import { SecurityService } from './security/security.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'jwt-security-frontend';
+  appTitle = 'JWT Security Demo';
 
   isLoggedIn$: boolean = false;
+
+  navList: NavItem[] = [
+    { linkTitle: 'Administration', link: '/administration', icon: 'people', privileges: ['ROLE_ADMIN_PRIVILEGE'] },
+    { linkTitle: 'Product', link: '/products', icon: 'home' }
+  ];
 
   constructor(
     private securityService: SecurityService

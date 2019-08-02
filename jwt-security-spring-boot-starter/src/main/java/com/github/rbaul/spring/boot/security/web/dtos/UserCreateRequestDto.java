@@ -36,5 +36,5 @@ public class UserCreateRequestDto {
     @NotNull
     @NotEmpty
     @Valid
-    private Collection<@Null Long> roleIds;
+    private Collection<@NotNull Long> roleIds;
 }

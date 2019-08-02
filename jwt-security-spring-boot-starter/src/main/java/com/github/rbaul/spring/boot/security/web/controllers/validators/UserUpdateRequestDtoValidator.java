@@ -55,7 +55,7 @@ public class UserUpdateRequestDtoValidator implements Validator {
      */
     private void validateUniqueUserName(UserUpdateRequestDto userUpdateRequestDto, Errors errors) {
         Optional<User> userOptional = userRepository.findByUsername(userUpdateRequestDto.getUsername());
-        if (userOptional.isPresent() && Objects.equals(userOptional.get().getId(), userUpdateRequestDto.getId())) {
+        if (userOptional.isPresent() && !Objects.equals(userOptional.get().getId(), userUpdateRequestDto.getId())) {
             errors.rejectValue(UserUpdateRequestDto.Fields.username, "User already exist with same username: " + userUpdateRequestDto.getUsername());
         }
     }

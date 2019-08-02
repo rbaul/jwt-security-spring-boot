@@ -1,0 +1,32 @@
+<div class="login-container" fxLayout="row" fxLayoutAlign="center center">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <mat-card>
+      <mat-card-title>Sign in</mat-card-title>
+      <mat-card-content>
+        <div>
+          <mat-form-field appearance="legacy" class="full-width-input">
+            <input matInput placeholder="User" formControlName="username" required>
+            <!-- <mat-icon matSuffix>person</mat-icon> -->
+            <mat-error *ngIf="isFieldInvalid('username')">
+              Please inform your user name
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field appearance="legacy" class="full-width-input">
+            <input matInput type="password" placeholder="Password" formControlName="password" required>
+            <!-- <mat-icon matSuffix>keyboard</mat-icon> -->
+            <mat-error *ngIf="isFieldInvalid('password')">
+              Please inform your password
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <mat-error *ngIf="errorMessage">{{errorMessage}}</mat-error>
+      </mat-card-content>
+      <mat-card-actions>
+          <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">Login</button>
+      </mat-card-actions>
+      <!-- <mat-card-footer *ngIf="errorMessage" style="background: #eb4b5b;">{{errorMessage}}</mat-card-footer> -->
+    </mat-card>
+  </form>
+</div>

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,18 +56,18 @@ public class UserController {
     @ApiOperation(value = "Update user")
     @PutMapping("{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDto updateUser(@PathVariable long userId, @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto, BindingResult bindingResult) throws NoSuchMethodException, MethodArgumentNotValidException {
+    public UserResponseDto updateUser(@PathVariable long userId, @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto, BindingResult bindingResult) throws MethodArgumentNotValidException, NoSuchMethodException {
         userUpdateRequestDto.setId(userId);
         userUpdateRequestDtoValidator.validate(userUpdateRequestDto, bindingResult);
         if (bindingResult.hasErrors()) {
-            MethodParameter userUpdateRequestDtoParameter = new MethodParameter(this.getClass().getDeclaredMethod("updateUser", UserUpdateRequestDto.class), 1);
+            MethodParameter userUpdateRequestDtoParameter = new MethodParameter(this.getClass().getDeclaredMethod("updateUser", long.class, UserUpdateRequestDto.class, BindingResult.class), 1);
             throw new MethodArgumentNotValidException(userUpdateRequestDtoParameter, bindingResult);
         }
         return userService.update(userId, userUpdateRequestDto);
     }
 
     @ApiOperation(value = "Get all users")
-    @GetMapping
+    @GetMapping("all")
     public List<UserResponseDto> getAllUsers() {
         return userService.getAll();
     }
@@ -74,7 +75,7 @@ public class UserController {
     @ApiOperation(value = "Fetch all users with paging")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Successfully lists products")})
-    @GetMapping("pageable")
+    @GetMapping
     public Page<UserResponseDto> getPageUsers(@PageableDefault @ApiIgnore(
             "Ignored because swagger ui shows the wrong params, " +
                     "instead they are explained in the implicit params"

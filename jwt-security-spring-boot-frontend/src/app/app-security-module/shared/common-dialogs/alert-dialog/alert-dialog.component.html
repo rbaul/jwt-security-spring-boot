@@ -1,0 +1,16 @@
+<div mat-dialog-title>
+  <mat-icon matSuffix style="color: red; vertical-align: sub;">warning</mat-icon>
+  {{data.title}}
+</div>
+
+<mat-dialog-content>
+  <h4>
+    <div *ngFor="let message of data?.messages">
+      {{message}}
+    </div>
+  </h4>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button class="mat-raised-button mat-primary" mat-dialog-close cdkFocusInitial>{{data.buttonName}}</button>
+</mat-dialog-actions>

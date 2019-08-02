@@ -91,6 +91,17 @@ public class JwtProvider {
     }
 
     /**
+     * Get the IssuedAt time from the token string
+     *
+     * @param token JWT string
+     * @return Issued At time
+     */
+    public Date getIssuedAtTime(String token) {
+        return Jwts.parser().setSigningKey(secretKey)
+                .parseClaimsJws(token).getBody().getIssuedAt();
+    }
+
+    /**
      * Get the roles from the token string
      *
      * @param token JWT string

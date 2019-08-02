@@ -21,13 +21,14 @@ import static org.springframework.security.core.userdetails.User.withUsername;
 public class DefaultUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
+    private final SessionService sessionService;
+
     private final JwtProvider jwtProvider;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() ->
-                new UsernameNotFoundException(String.format("User with name %s does not exist", username)));
+        User user = getUser(username);
 
         return withUsername(user.getUsername())
                 .password(user.getPassword())
@@ -39,6 +40,11 @@ public class DefaultUserDetailsService implements UserDetailsService {
                 .build();
     }
 
+    private User getUser(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException(String.format("User with name %s does not exist", username)));
+    }
+
     /**
      * Extract username and roles from a validated jwt string.
      *
@@ -47,6 +53,12 @@ public class DefaultUserDetailsService implements UserDetailsService {
      */
     public Optional<UserDetails> loadUserByJwtToken(String jwtToken) {
         if (jwtProvider.isValidToken(jwtToken)) {
+
+            // Validate iat
+            if (!sessionService.validateLoginTime(jwtToken)) {
+                return Optional.empty();
+            }
+
             return Optional.of(
                     withUsername(jwtProvider.getUsername(jwtToken))
                             .authorities(jwtProvider.getGrantedAuthorities(jwtToken))

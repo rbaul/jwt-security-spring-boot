@@ -2,8 +2,10 @@ package com.github.rbaul.spring.boot.security.services;
 
 import com.github.rbaul.spring.boot.security.domain.model.Privilege;
 import com.github.rbaul.spring.boot.security.domain.model.Role;
+import com.github.rbaul.spring.boot.security.domain.model.User;
 import com.github.rbaul.spring.boot.security.domain.repository.PrivilegeRepository;
 import com.github.rbaul.spring.boot.security.domain.repository.RoleRepository;
+import com.github.rbaul.spring.boot.security.services.exceptions.RoleException;
 import com.github.rbaul.spring.boot.security.web.dtos.RoleCreateRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.RoleResponseDto;
 import com.github.rbaul.spring.boot.security.web.dtos.RoleUpdateRequestDto;
@@ -15,8 +17,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +48,7 @@ public class RoleService {
     @Transactional
     public RoleResponseDto createRole(RoleCreateRequestDto roleCreateRequestDto) {
         Role newRole = modelMapper.map(roleCreateRequestDto, Role.class);
-        Set<Privilege> privileges = privilegeRepository.findByIdIn(roleCreateRequestDto.getPrivilegeIds());
+        Collection<Privilege> privileges = privilegeRepository.findByIdIn(roleCreateRequestDto.getPrivilegeIds());
         newRole.setPrivileges(privileges);
         Role role = roleRepository.save(newRole);
         return modelMapper.map(role, RoleResponseDto.class);
@@ -58,6 +60,11 @@ public class RoleService {
     @Transactional
     public void deleteRole(long roleId) {
         Role role = getRoleById(roleId);
+        if (!role.getUsers().isEmpty()) {
+            throw new RoleException("Role in use by: " + role.getUsers().stream()
+                    .map(User::getUsername)
+                    .collect(Collectors.joining(",")));
+        }
         role.getPrivileges().forEach(privilege -> privilege.removeRole(role));
         roleRepository.deleteById(roleId);
     }
@@ -80,7 +87,7 @@ public class RoleService {
         Role role = getRoleById(roleId);
         role.setName(roleUpdateRequestDto.getName());
         role.setDescription(roleUpdateRequestDto.getDescription());
-        Set<Privilege> privileges = privilegeRepository.findByIdIn(roleUpdateRequestDto.getPrivilegeIds());
+        Collection<Privilege> privileges = privilegeRepository.findByIdIn(roleUpdateRequestDto.getPrivilegeIds());
         role.setPrivileges(privileges);
         return modelMapper.map(role, RoleResponseDto.class);
     }

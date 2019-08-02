@@ -34,6 +34,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final SessionService sessionService;
+
     private final AuthenticationManager authenticationManager;
 
     private final RoleRepository roleRepository;
@@ -41,6 +43,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtProvider jwtProvider;
+
+    private final DefaultUserDetailsService defaultUserDetailsService;
 
     private final ModelMapper modelMapper;
 
@@ -51,7 +55,7 @@ public class UserService {
      * @param password password
      * @return Optional of the Java Web Token, empty otherwise
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponseDto login(String username, String password) {
         log.info("Username '{}' attempting to sign in", username);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -61,6 +65,10 @@ public class UserService {
         Set<String> roleNames = user.getRoleNames();
         String token = jwtProvider.createToken(username, roleNames, privilegeNames);
         Date expirationTime = jwtProvider.getExpirationTime(token);
+
+        // Update session
+        sessionService.updateSession(token);
+
         return LoginResponseDto.builder()
                 .isAuthenticated(true)
                 .bearerToken(token)
@@ -73,13 +81,14 @@ public class UserService {
      *
      * @param userCreateRequestDto singup information
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public UserResponseDto create(UserCreateRequestDto userCreateRequestDto) {
         User newUser = modelMapper.map(userCreateRequestDto, User.class);
         Collection<Role> roles = roleRepository.findByIdIn(userCreateRequestDto.getRoleIds());
         newUser.setRoles(roles);
         newUser.setPassword(passwordEncoder.encode(userCreateRequestDto.getPassword()));
         User user = userRepository.save(newUser);
+        sessionService.createSession(userCreateRequestDto.getUsername());
         return modelMapper.map(user, UserResponseDto.class);
     }
 
@@ -99,8 +108,7 @@ public class UserService {
         user.setLastName(userUpdateRequestDto.getLastName());
         user.setPassword(passwordEncoder.encode(userUpdateRequestDto.getPassword()));
         user.setRoles(roles);
-        user.setFirstName(userUpdateRequestDto.getFirstName());
-
+        sessionService.logoutSession(userUpdateRequestDto.getUsername());
         return modelMapper.map(user, UserResponseDto.class);
     }
 
@@ -135,5 +143,16 @@ public class UserService {
     private User getUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("No found user with id: " + userId, 1));
+    }
+
+    /**
+     * Logout
+     *
+     * @param token - JWT token
+     */
+    @Transactional
+    public void logout(String token) {
+        defaultUserDetailsService.loadUserByJwtToken(token)
+                .ifPresent(userDetails -> sessionService.logoutSession(userDetails.getUsername()));
     }
 }
