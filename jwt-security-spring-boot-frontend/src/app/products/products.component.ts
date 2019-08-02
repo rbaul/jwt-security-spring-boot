@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatPaginator, MatSort, MatTableDataSource, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material';
-import { ProductService } from '../services/product.service';
+import { ProductService } from './services/product.service';
 import { Product } from './models/product';
-import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
 import { ProductDialogComponent } from './product-dialog/product-dialog.component';
+import { DialogService } from '../app-security-module/shared/common-dialogs/dialog.service';
 
 @Component({
   selector: 'app-products',
@@ -15,19 +15,22 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   dataSource: MatTableDataSource<Product> = new MatTableDataSource();
 
-  checked = false;
-
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['id', 'name', 'description', 'price', 'state', 'actions'];
 
   constructor(
     private dialog: MatDialog,
-    private productApiService: ProductService
+    private productApiService: ProductService,
+    private dialogService: DialogService
     ) { }
 
   ngOnInit() {
-    this.productApiService.getAllProducts().subscribe(products => {
-      this.dataSource.data = products;
+    this.refreshProducts();
+  }
+
+  private refreshProducts() {
+    this.productApiService.getPageableProducts().subscribe(products => {
+      this.dataSource.data = products.content;
     });
   }
 
@@ -40,21 +43,6 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   applyFilter(filterValue: string): void {
     filterValue = filterValue.trim().toLocaleLowerCase();
     this.dataSource.filter = filterValue;
-  }
-
-  openConfirmDialog(): MatDialogRef<ConfirmationDialogComponent> {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-
-    dialogConfig.data = {
-      message: 'Are you sure to delete this product?',
-      okName: 'Delete',
-      title: 'Deletion'
-    };
-
-    return this.dialog.open(ConfirmationDialogComponent, dialogConfig);
   }
 
   openProductDialog(productData: Product): MatDialogRef<ProductDialogComponent> {
@@ -71,8 +59,9 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   createProduct() {
     this.openProductDialog(new Product()).afterClosed().subscribe(
       data => {
-        if (data !== undefined) {
-          this.productApiService.addProduct(data).subscribe();
+        if (data) {
+          this.productApiService.addProduct(data)
+          .subscribe(response => this.refreshProducts());
         }
       }
     );
@@ -81,20 +70,24 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   editProduct(product: Product) {
     this.openProductDialog(product).afterClosed().subscribe(
       data => {
-        if (data !== undefined) {
+        if (data) {
           this.productApiService.updateProduct(product.id, data)
-        .subscribe(response => console.log(response));
+            .subscribe(response => this.refreshProducts());
         }
       }
     );
   }
 
   deleteProduct(product: Product) {
-    this.openConfirmDialog().afterClosed().subscribe(
+    this.dialogService.openConfirmDialog({
+      message: 'Are you sure to delete this product?',
+      okName: 'Delete',
+      title: 'Deletion'
+    }).afterClosed().subscribe(
       data => {
-        if (data !== undefined) {
+        if (data) {
           this.productApiService.deleteProduct(product.id)
-        .subscribe(response => console.log(response));
+            .subscribe(response => this.refreshProducts());
         }
       }
     );

@@ -28,7 +28,7 @@
 <dependency>
     <groupId>com.github.rbaul</groupId>
     <artifactId>jwt-security-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -38,5 +38,49 @@ repositories {
     maven { url "https://oss.sonatype.org/content/groups/public" }
 }
 
-compile 'com.github.rbaul:jwt-security-spring-boot-starter:0.0.1-SNAPSHOT'
+compile 'com.github.rbaul:jwt-security-spring-boot-starter:0.0.2-SNAPSHOT'
+```
+
+## Properties example
+> Privilege must have prefix `ROLE_`
+```yaml
+security.jwt:
+#    token:
+#      expiration: 600000
+#      secret-key: secret-key-for-encryption
+#      header-name: Authorization
+#      password-strength: 7
+#      prefix: Bearer
+#      claims:
+#        roles-key: roles
+#        privilege-key: privileges
+  roles:
+    - name: Viewer
+      description: View user
+      privileges:
+        - ROLE_VIEW_PRIVILEGE
+    - name: Editor
+      description: Editor user
+      privileges:
+        - ROLE_CHANGE_PRIVILEGE
+        - ROLE_VIEW_PRIVILEGE
+  users:
+    - username: viewer
+      password: viewer
+      roles:
+        - Viewer
+    - username: editor
+      password: editor
+      roles:
+        - Editor
+  privileges:
+    - name: ROLE_CHANGE_PRIVILEGE
+      description: "Change privilege"
+    - name: ROLE_VIEW_PRIVILEGE
+      description: "View privilege"
+#  administrator:
+#    username: admin
+#    password: admin
+#    role-name: Administrator
+#    privilege-name: ROLE_ADMIN_PRIVILEGE
 ```

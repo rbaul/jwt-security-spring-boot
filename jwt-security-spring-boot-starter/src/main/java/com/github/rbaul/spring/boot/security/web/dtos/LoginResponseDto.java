@@ -11,9 +11,7 @@ import java.util.Date;
 @Builder
 @ToString
 public class LoginResponseDto {
-    private String username;
     private String bearerToken;
     private boolean isAuthenticated;
-//    private List<String> claims;
-//    private Date expiredAt;
+    private Date expiredAt;
 }

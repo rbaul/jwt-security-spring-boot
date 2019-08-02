@@ -27,7 +27,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
-@RequestMapping("api/product")
+@RequestMapping("api/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -36,6 +36,7 @@ public class ProductController {
     @ApiResponses({@ApiResponse(code = 200, message = "Retrieved Product"),
             @ApiResponse(code = 404, message = "Product Not Found", response = ErrorDto.class)})
     @ResponseStatus(code = HttpStatus.OK)
+    @Secured({"ROLE_VIEW_PRIVILEGE"})
     @GetMapping("{productId}")
     public ProductDto getProduct(@PathVariable long productId) {
         return productService.get(productId);
@@ -44,20 +45,19 @@ public class ProductController {
     @ApiOperation(value = "Get All Product")
     @ApiResponses({@ApiResponse(code = 200, message = "Retrieved All Product")})
     @ResponseStatus(code = HttpStatus.OK)
+    @Secured({"ROLE_VIEW_PRIVILEGE"})
     @GetMapping("all")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public List<ProductDto> getAllProduct() {
         return productService.getAll();
     }
-
 
     @ApiOperation(value = "Create Product")
     @ApiResponses({
             @ApiResponse(code = 201, message = "Successfully Product created"),
             @ApiResponse(code = 428, message = "Invalid Product info", response = ErrorDto.class)})
     @ResponseStatus(code = HttpStatus.CREATED)
+    @Secured({"ROLE_CHANGE_PRIVILEGE"})
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
     public ProductDto create(
             @ApiParam(value = "Product object that needs to be create", name = "ProductDto", required = true)
             @Validated(ValidationGroups.Create.class) @RequestBody ProductDto productDto) {
@@ -69,6 +69,7 @@ public class ProductController {
             @ApiResponse(code = 200, message = "Successfully Product updated"),
             @ApiResponse(code = 428, message = "Invalid product info", response = ErrorDto.class)})
     @ResponseStatus(code = HttpStatus.OK)
+    @Secured({"ROLE_CHANGE_PRIVILEGE"})
     @PutMapping("{productId}")
     public ProductDto update(@PathVariable long productId,
                                    @ApiParam(value = "Product object that needs to be edit", name = "ProductDto", required = true)
@@ -81,6 +82,7 @@ public class ProductController {
             @ApiResponse(code = 201, message = "Successfully Product deleted"),
             @ApiResponse(code = 428, message = "Invalid product Id", response = ErrorDto.class)})
     @ResponseStatus(code = HttpStatus.OK)
+    @Secured({"ROLE_CHANGE_PRIVILEGE"})
     @DeleteMapping("{productId}")
     public void delete(@PathVariable long productId) {
         productService.delete(productId);
@@ -90,7 +92,7 @@ public class ProductController {
     @ApiImplicitPageable
     @ApiResponses({
             @ApiResponse(code = 200, message = "Successfully lists products")})
-    @ResponseStatus(code = HttpStatus.OK)
+    @Secured({"ROLE_VIEW_PRIVILEGE"})
     @GetMapping
     public Page<ProductDto> fetch(@PageableDefault @ApiIgnore(
             "Ignored because swagger ui shows the wrong params, " +

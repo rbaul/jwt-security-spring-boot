@@ -1,6 +1,6 @@
 package com.github.rbaul.spring.boot.security.web.handlers;
 
-import com.github.rbaul.spring.boot.security.web.dtos.errors.ErrorCodes;
+import com.github.rbaul.spring.boot.security.web.dtos.errors.ErrorSecurityCodes;
 import com.github.rbaul.spring.boot.security.web.dtos.errors.ErrorDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ public class GlobalErrorHandlers {
     public ErrorDto handleGlobalError(Exception ex) {
         log.error("Global error handler exception: ", ex);
         return ErrorDto.builder()
-                .errorCode(ErrorCodes.UNKNOWN.toString())
+                .errorCode(ErrorSecurityCodes.UNKNOWN.toString())
                 .message(ex.getLocalizedMessage())
                 .build();
     }

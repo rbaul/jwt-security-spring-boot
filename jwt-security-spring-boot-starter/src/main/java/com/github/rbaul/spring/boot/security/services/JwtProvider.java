@@ -1,7 +1,6 @@
 package com.github.rbaul.spring.boot.security.services;
 
 import com.github.rbaul.spring.boot.security.config.JwtSecurityProperties;
-import com.github.rbaul.spring.boot.security.domain.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -12,39 +11,38 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JwtProvider{
+public class JwtProvider {
 
-    private String secretKey;
-    private long validityInMilliseconds;
-    private String rolesKey;
+    private final String secretKey;
+    private final long validityInMilliseconds;
+    private final String rolesKey;
+    private final String privilegesKey;
 
     @Autowired
     public JwtProvider(JwtSecurityProperties.JwtSecurityTokenProperties jwtSecurityTokenProperties) {
         this.secretKey = Base64.getEncoder().encodeToString(jwtSecurityTokenProperties.getSecretKey().getBytes());
         this.validityInMilliseconds = jwtSecurityTokenProperties.getExpiration();
-        this.rolesKey = jwtSecurityTokenProperties.getRolesKey();
+        this.rolesKey = jwtSecurityTokenProperties.getClaims().getRolesKey();
+        this.privilegesKey = jwtSecurityTokenProperties.getClaims().getPrivilegesKey();
     }
 
     /**
-     * Create JWT string given username and roles.
+     * Create JWT string given username and granted authorities.
      *
-     * @param username
-     * @param roles
+     * @param username       username
+     * @param roleNames      roles
+     * @param privilegeNames All privilege accesses supported by user
      * @return jwt string
      */
-    public String createToken(String username, List<Role> roles) {
+    public String createToken(String username, Set<String> roleNames, Collection<String> privilegeNames) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put(rolesKey, roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
-                .collect(Collectors.toList()));
+        claims.put(rolesKey, roleNames);
+        claims.put(privilegesKey, privilegeNames);
         Date now = new Date();
         Date expiresAt = new Date(now.getTime() + validityInMilliseconds);
         return Jwts.builder()
@@ -82,16 +80,42 @@ public class JwtProvider{
     }
 
     /**
+     * Get the Expiration time from the token string
+     *
+     * @param token JWT string
+     * @return Expiration time
+     */
+    public Date getExpirationTime(String token) {
+        return Jwts.parser().setSigningKey(secretKey)
+                .parseClaimsJws(token).getBody().getExpiration();
+    }
+
+    /**
+     * Get the IssuedAt time from the token string
+     *
+     * @param token JWT string
+     * @return Issued At time
+     */
+    public Date getIssuedAtTime(String token) {
+        return Jwts.parser().setSigningKey(secretKey)
+                .parseClaimsJws(token).getBody().getIssuedAt();
+    }
+
+    /**
      * Get the roles from the token string
      *
-     * @param token jwt
-     * @return username
+     * @param token JWT string
+     * @return privilege accesses
      */
-    public List<GrantedAuthority> getRoles(String token) {
-        List<Map<String, String>>  roleClaims = Jwts.parser().setSigningKey(secretKey)
-                .parseClaimsJws(token).getBody().get(rolesKey, List.class);
-        return roleClaims.stream().map(roleClaim ->
-                new SimpleGrantedAuthority(roleClaim.get("authority")))
+    public List<GrantedAuthority> getGrantedAuthorities(String token) {
+        List<String> privilegeClaims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get(privilegesKey, List.class);
+        return privilegeClaims.stream()
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
+
 }

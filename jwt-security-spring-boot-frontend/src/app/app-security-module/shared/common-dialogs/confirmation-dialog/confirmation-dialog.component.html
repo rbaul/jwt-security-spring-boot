@@ -1,0 +1,13 @@
+<div mat-dialog-title>
+  <mat-icon matSuffix style="vertical-align: sub;">question_answer</mat-icon>
+  {{data.title}}
+</div>
+
+<mat-dialog-content>
+  <h4>{{data.message}}</h4>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button class="mat-raised-button mat-primary" mat-dialog-close="true" cdkFocusInitial>{{data.okName}}</button>
+    <button class="mat-raised-button" mat-dialog-close>Close</button>
+</mat-dialog-actions>

@@ -7,7 +7,7 @@
         <mat-form-field>
             <input matInput
                     placeholder="Product Name"
-                  formControlName="name">
+                  formControlName="name" required>
         </mat-form-field>
       </div>
 
@@ -15,7 +15,7 @@
         <mat-form-field>
             <input matInput
                     placeholder="Product Description"
-                  formControlName="description">
+                  formControlName="description" required>
         </mat-form-field>
       </div>
 
@@ -23,13 +23,13 @@
         <mat-form-field>
             <input matInput type="number"
                     placeholder="Product Price"
-                  formControlName="price">
+                  formControlName="price" required>
         </mat-form-field>
       </div>
 
       <div>
         <mat-form-field>
-          <mat-select placeholder="Product state" formControlName="state">
+          <mat-select placeholder="Product state" formControlName="state" required>
             <mat-option *ngFor="let state of productStates" [value]="state">
               {{state}}
             </mat-option>
@@ -39,8 +39,8 @@
   
   </mat-dialog-content>
 
-  <mat-dialog-actions>
-      <button class="mat-raised-button mat-primary"(click)="save()" [disabled]="!form.valid">Save</button>
-      <button class="mat-raised-button"(click)="close()">Close</button>
+  <mat-dialog-actions align="end">
+      <button class="mat-raised-button mat-primary" (click)="save()" [disabled]="!form.valid">Save</button>
+      <button class="mat-raised-button" mat-dialog-close>Close</button>
   </mat-dialog-actions>
 </form>

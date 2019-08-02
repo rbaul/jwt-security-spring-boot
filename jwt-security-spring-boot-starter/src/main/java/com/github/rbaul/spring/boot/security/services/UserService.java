@@ -5,19 +5,27 @@ import com.github.rbaul.spring.boot.security.domain.model.User;
 import com.github.rbaul.spring.boot.security.domain.repository.RoleRepository;
 import com.github.rbaul.spring.boot.security.domain.repository.UserRepository;
 import com.github.rbaul.spring.boot.security.web.dtos.LoginResponseDto;
-import com.github.rbaul.spring.boot.security.web.dtos.SignUpDto;
+import com.github.rbaul.spring.boot.security.web.dtos.UserCreateRequestDto;
+import com.github.rbaul.spring.boot.security.web.dtos.UserResponseDto;
+import com.github.rbaul.spring.boot.security.web.dtos.UserUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -25,6 +33,8 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    private final SessionService sessionService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -34,81 +44,115 @@ public class UserService {
 
     private final JwtProvider jwtProvider;
 
+    private final DefaultUserDetailsService defaultUserDetailsService;
+
+    private final ModelMapper modelMapper;
+
     /**
      * Sign in a user into the application, with JWT-enabled authentication
      *
-     * @param username  username
-     * @param password  password
+     * @param username username
+     * @param password password
      * @return Optional of the Java Web Token, empty otherwise
      */
-    public Optional<LoginResponseDto> signin(String username, String password) {
-        log.info("New user attempting to sign in");
-        Optional<LoginResponseDto> loginResponse = Optional.empty();
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            try {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-                String token = jwtProvider.createToken(username, user.get().getRoles());
-                loginResponse = Optional.of(LoginResponseDto.builder()
-                        .username(username)
-                        .isAuthenticated(true)
-                        .bearerToken(token).build());
-            } catch (AuthenticationException e){
-                log.info("Log in failed for user {}", username);
-            }
-        }
-        return loginResponse;
+    @Transactional
+    public LoginResponseDto login(String username, String password) {
+        log.info("Username '{}' attempting to sign in", username);
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EmptyResultDataAccessException("No found user with username: " + username, 1));
+        Set<String> privilegeNames = user.getPrivilegeNames();
+        Set<String> roleNames = user.getRoleNames();
+        String token = jwtProvider.createToken(username, roleNames, privilegeNames);
+        Date expirationTime = jwtProvider.getExpirationTime(token);
+
+        // Update session
+        sessionService.updateSession(token);
+
+        return LoginResponseDto.builder()
+                .isAuthenticated(true)
+                .bearerToken(token)
+                .expiredAt(expirationTime)
+                .build();
     }
 
     /**
      * Create a new user in the database.
      *
-     * @param signUpDto singup information
-     * @return Optional of user, empty if the user already exists.
+     * @param userCreateRequestDto singup information
      */
-    public Optional<User> create(SignUpDto signUpDto) {
-        log.info("New user attempting to sign in");
-        Optional<User> user = Optional.empty();
-        if (!userRepository.findByUsername(signUpDto.getUsername()).isPresent()) {
-            Role role = roleRepository.findByRoleName(signUpDto.getRole())
-                    .orElseThrow(() -> new RuntimeException("Role not present"));
-            user = Optional.of(userRepository.save(User.builder()
-                    .username(signUpDto.getUsername())
-                    .password(passwordEncoder.encode(signUpDto.getPassword()))
-                    .roles(Collections.singletonList(role))
-                    .firstName(signUpDto.getFirstName())
-                    .lastName(signUpDto.getLastName()).build()));
-        }
-        return user;
+    @Transactional
+    public UserResponseDto create(UserCreateRequestDto userCreateRequestDto) {
+        User newUser = modelMapper.map(userCreateRequestDto, User.class);
+        Collection<Role> roles = roleRepository.findByIdIn(userCreateRequestDto.getRoleIds());
+        newUser.setRoles(roles);
+        newUser.setPassword(passwordEncoder.encode(userCreateRequestDto.getPassword()));
+        User user = userRepository.save(newUser);
+        sessionService.createSession(userCreateRequestDto.getUsername());
+        return modelMapper.map(user, UserResponseDto.class);
     }
 
     /**
-     * Create a new user in the database.
+     * Update a user in the database.
      *
-     * @param userId User ID
-     * @param signUpDto singup information
-     * @return Optional of user, empty if the user already exists.
+     * @param userId               User ID
+     * @param userUpdateRequestDto singup information
      */
-    public User update(long userId, SignUpDto signUpDto) {
-//        Optional<User> user = Optional.empty();
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Not Found"));
-        Role role = roleRepository.findByRoleName(signUpDto.getRole())
-                .orElseThrow(() -> new RuntimeException("Role not present"));
+    @Transactional
+    public UserResponseDto update(long userId, UserUpdateRequestDto userUpdateRequestDto) {
+        User user = getUserById(userId);
+        Collection<Role> roles = roleRepository.findByIdIn(userUpdateRequestDto.getRoleIds());
 
-        user.setUsername(signUpDto.getUsername());
-        user.setFirstName(signUpDto.getFirstName());
-        user.setLastName(signUpDto.getLastName());
-        user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
-        user.setRoles(Collections.singletonList(role));
-        user.setFirstName(signUpDto.getFirstName());
-        return user;
+        user.setUsername(userUpdateRequestDto.getUsername());
+        user.setFirstName(userUpdateRequestDto.getFirstName());
+        user.setLastName(userUpdateRequestDto.getLastName());
+        user.setPassword(passwordEncoder.encode(userUpdateRequestDto.getPassword()));
+        user.setRoles(roles);
+        sessionService.logoutSession(userUpdateRequestDto.getUsername());
+        return modelMapper.map(user, UserResponseDto.class);
     }
 
-    public List<User> getAll() {
-        return userRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAll() {
+        return userRepository.findAll().stream()
+                .map(user -> modelMapper.map(user, UserResponseDto.class))
+                .collect(Collectors.toList());
     }
 
-    public Optional<User> getUser(long userId) {
-        return userRepository.findById(userId);
+    @Transactional(readOnly = true)
+    public UserResponseDto getUser(long userId) {
+        return modelMapper.map(getUserById(userId), UserResponseDto.class);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponseDto> getPageable(Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return usersPage.map(user -> modelMapper.map(user, UserResponseDto.class));
+    }
+
+    /**
+     * Remove user
+     */
+    @Transactional
+    public void deleteUser(long userId) {
+        User user = getUserById(userId);
+        user.getRoles().forEach(role -> role.removeUser(user));
+        userRepository.deleteById(userId);
+    }
+
+    private User getUserById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EmptyResultDataAccessException("No found user with id: " + userId, 1));
+    }
+
+    /**
+     * Logout
+     *
+     * @param token - JWT token
+     */
+    @Transactional
+    public void logout(String token) {
+        defaultUserDetailsService.loadUserByJwtToken(token)
+                .ifPresent(userDetails -> sessionService.logoutSession(userDetails.getUsername()));
     }
 }
