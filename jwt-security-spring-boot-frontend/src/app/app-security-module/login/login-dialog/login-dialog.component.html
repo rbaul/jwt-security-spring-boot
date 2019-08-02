@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Sign in</h2>
+
+    <form [formGroup]="loginForm">
+        <mat-dialog-content>
+          <div>
+            <mat-form-field appearance="legacy" class="full-width-input">
+              <input matInput placeholder="User" formControlName="username" required>
+              <!-- <mat-icon matSuffix>person</mat-icon> -->
+              <mat-error *ngIf="isFieldInvalid('username')">
+                Please inform your user name
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field appearance="legacy" class="full-width-input">
+              <input matInput type="password" placeholder="Password" formControlName="password" required>
+              <!-- <mat-icon matSuffix>keyboard</mat-icon> -->
+              <mat-error *ngIf="isFieldInvalid('password')">
+                Please inform your password
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <mat-error *ngIf="errorMessage">{{errorMessage}}</mat-error>
+
+    </mat-dialog-content>
+
+      <mat-dialog-actions align="end">
+          <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!loginForm.valid">Login</button>
+          <button class="mat-raised-button" mat-dialog-close>Close</button>
+      </mat-dialog-actions>
+    </form>
+  

@@ -12,6 +12,8 @@ import { ErrorDto } from '../models/error';
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
 
+  public loginDialogOpened = false;
+
   constructor(
     private router: Router,
     private securityService: SecurityService,
@@ -43,9 +45,25 @@ export class HttpRequestInterceptor implements HttpInterceptor {
             status: error.status
         };
         if (error.status === 401 || error.status === 403) {
-          this.securityService.logoutProccess();
-          const returnUrl = this.router.url.indexOf('login') > -1 ? '' : `?returnUrl=${this.router.url}`;
-          this.router.navigateByUrl(`/login${returnUrl}`);
+
+          if (!this.loginDialogOpened) {
+            this.loginDialogOpened = true;
+            this.dialogService.openLoginDialog().afterClosed()
+            .subscribe(
+              data => {
+                if (data) {
+                  this.loginDialogOpened = false;
+                } else {
+                  this.loginDialogOpened = false;
+                  this.securityService.logoutProccess();
+                  const returnUrl = this.router.url.indexOf('login') > -1 ? '' : `?returnUrl=${this.router.url}`;
+                  this.router.navigateByUrl(`/login${returnUrl}`);
+                }
+              }
+            );
+          }
+          // const returnUrl = this.router.url.indexOf('login') > -1 ? '' : `?returnUrl=${this.router.url}`;
+          // this.router.navigateByUrl(`/login${returnUrl}`);
         } else {
           let messages = [];
           if (error.error.errorCode) {

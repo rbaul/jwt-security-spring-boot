@@ -19,6 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '../app-routing.module';
 import { AppSecurityRoutingModule } from './app-security-routing.module';
+import { LoginDialogComponent } from './login/login-dialog/login-dialog.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { AppSecurityRoutingModule } from './app-security-routing.module';
     AlertDialogComponent,
     RolesComponent,
     AdministrationComponent,
-    RoleDialogComponent
+    RoleDialogComponent,
+    LoginDialogComponent
   ],
   imports: [
     CommonModule,
@@ -63,7 +65,8 @@ import { AppSecurityRoutingModule } from './app-security-routing.module';
     ConfirmationDialogComponent,
     UserDialogComponent,
     AlertDialogComponent,
-    RoleDialogComponent
+    RoleDialogComponent,
+    LoginDialogComponent
   ]
 })
 export class AppSecurityModule { }
