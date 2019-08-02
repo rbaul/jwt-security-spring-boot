@@ -3,7 +3,6 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { DialogService } from '../shared/common-dialogs/dialog.service';
 import { UserAuth, UserAuthResponse } from '../models/user-auth';
 import { SecurityApiService } from '../services/security-api.service';
 import { User } from '../models/user';
@@ -19,8 +18,7 @@ export class SecurityService {
   private loggedUser: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(
-    private securityApi: SecurityApiService,
-    private dialogService: DialogService
+    private securityApi: SecurityApiService
   ) {
     const token: string = localStorage.getItem('bearerToken');
 
