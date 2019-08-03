@@ -19,6 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '../app-routing.module';
 import { AppSecurityRoutingModule } from './app-security-routing.module';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material';
 
 
 @NgModule({
@@ -58,7 +59,14 @@ import { AppSecurityRoutingModule } from './app-security-routing.module';
     AdministrationComponent,
     RoleDialogComponent
   ],
-  providers: [],
+  providers: [
+    {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {
+      duration: 2500,
+      verticalPosition: 'top',
+      // horizontalPosition: 'end',
+      panelClass: ['success-snackbar']
+    }}
+  ],
   entryComponents: [
     ConfirmationDialogComponent,
     UserDialogComponent,

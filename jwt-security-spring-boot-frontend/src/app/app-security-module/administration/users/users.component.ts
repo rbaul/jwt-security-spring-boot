@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { MatPaginator, MatSort, MatTableDataSource, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material';
+import { MatPaginator, MatSort, MatTableDataSource, MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar } from '@angular/material';
 import { UserApiService } from '../../services/user-api.service';
 import { UserResponseDto } from '../../models/user';
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
@@ -21,7 +21,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
   constructor(
     private dialog: MatDialog,
     private userApiService: UserApiService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private _snackBar: MatSnackBar
     ) { }
 
   ngOnInit() {
@@ -61,8 +62,10 @@ export class UsersComponent implements OnInit, AfterViewInit {
       data => {
         if (data) {
           this.userApiService.create(data).subscribe(
-            response => this.refreshUsers()
-          );
+            response => {
+              this._snackBar.open('User has been created successfully');
+              this.refreshUsers();
+            });
         }
       }
     );
@@ -74,8 +77,10 @@ export class UsersComponent implements OnInit, AfterViewInit {
         data => {
           if (data) {
             this.userApiService.update(user.id, data).subscribe(
-              response => this.refreshUsers()
-            );
+              response => {
+                this._snackBar.open('User has been updated successfully');
+                this.refreshUsers();
+              });
           }
         }
       );
@@ -92,6 +97,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
         if (data) {
           this.userApiService.deleteUser(userId).subscribe(
             response => {
+              this._snackBar.open('User has been deleted successfully');
               this.refreshUsers();
             }
           );

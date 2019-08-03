@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { MatPaginator, MatSort, MatTableDataSource, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material';
+import { MatPaginator, MatSort, MatTableDataSource, MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar } from '@angular/material';
 import { ProductService } from './services/product.service';
 import { Product } from './models/product';
 import { ProductDialogComponent } from './product-dialog/product-dialog.component';
@@ -21,7 +21,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   constructor(
     private dialog: MatDialog,
     private productApiService: ProductService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private _snackBar: MatSnackBar
     ) { }
 
   ngOnInit() {
@@ -61,7 +62,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       data => {
         if (data) {
           this.productApiService.addProduct(data)
-          .subscribe(response => this.refreshProducts());
+          .subscribe(response => {
+            this._snackBar.open('Product has been created successfully');
+            this.refreshProducts();
+          });
         }
       }
     );
@@ -72,7 +76,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       data => {
         if (data) {
           this.productApiService.updateProduct(product.id, data)
-            .subscribe(response => this.refreshProducts());
+            .subscribe(response => {
+              this._snackBar.open('Product has been updated successfully');
+              this.refreshProducts();
+            });
         }
       }
     );
@@ -87,7 +94,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       data => {
         if (data) {
           this.productApiService.deleteProduct(product.id)
-            .subscribe(response => this.refreshProducts());
+            .subscribe(response => {
+              this._snackBar.open('Product has been deleted successfully');
+              this.refreshProducts();
+            });
         }
       }
     );

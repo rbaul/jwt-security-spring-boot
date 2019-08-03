@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { MatDialog, MatSort, MatPaginator, MatTableDataSource, MatDialogRef, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatSort, MatPaginator, MatTableDataSource, MatDialogRef, MatDialogConfig, MatSnackBar } from '@angular/material';
 import { RoleApiService } from 'src/app/app-security-module/services/role-api.service';
 import { RoleResponseDto, PrivilegeResponseDto } from 'src/app/app-security-module/models/role';
 import { DialogService } from 'src/app/app-security-module/shared/common-dialogs/dialog.service';
@@ -21,7 +21,8 @@ export class RolesComponent implements OnInit, AfterViewInit {
   constructor(
     private dialog: MatDialog,
     private roleApiService: RoleApiService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private _snackBar: MatSnackBar
     ) { }
 
   ngOnInit() {
@@ -65,7 +66,10 @@ export class RolesComponent implements OnInit, AfterViewInit {
       data => {
         if (data) {
           this.roleApiService.create(data).subscribe(
-            response => this.refreshRoles()
+            response => {
+              this._snackBar.open('Role has been created successfully');
+              this.refreshRoles();
+            }
           );
         }
       }
@@ -78,8 +82,10 @@ export class RolesComponent implements OnInit, AfterViewInit {
         data => {
           if (data) {
             this.roleApiService.update(role.id, data).subscribe(
-              response => this.refreshRoles()
-            );
+              response => {
+                this._snackBar.open('Role has been updated successfully');
+                this.refreshRoles();
+              });
           }
         }
       );
@@ -96,6 +102,7 @@ export class RolesComponent implements OnInit, AfterViewInit {
         if (data) {
           this.roleApiService.deleteRole(roleId).subscribe(
             response => {
+              this._snackBar.open('Role has been deleted successfully');
               this.refreshRoles();
             }
           );
