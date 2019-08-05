@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
 
   navList: NavItem[] = [
     { linkTitle: 'Administration', link: '/administration', icon: 'people', privileges: ['ROLE_ADMIN_PRIVILEGE'] },
+    { linkTitle: 'Activity Log', link: '/activity-logs', icon: 'remove_red_eye', privileges: ['ROLE_ACTIVITY_PRIVILEGE'] },
     { linkTitle: 'Product', link: '/products', icon: 'home' }
   ];
 

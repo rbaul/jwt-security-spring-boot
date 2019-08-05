@@ -12,12 +12,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './app-security-module/shared/material.module';
+import { ActivityLogComponent } from './activity-log/activity-log.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductsComponent,
-    ProductDialogComponent
+    ProductDialogComponent,
+    ActivityLogComponent
   ],
   imports: [
     CommonModule,

@@ -1,6 +1,7 @@
 package com.github.rbaul.spring.boot.security.web.dtos;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldNameConstants
 @ToString
 public class LoginRequestDto {
     @NotNull

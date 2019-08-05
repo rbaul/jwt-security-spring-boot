@@ -1,5 +1,6 @@
 package com.github.rbaul.spring.boot.security.web.controllers;
 
+import com.github.rbaul.spring.boot.activity_log.config.ActivityLog;
 import com.github.rbaul.spring.boot.security.services.RoleService;
 import com.github.rbaul.spring.boot.security.web.controllers.validators.RoleCreateRequestDtoValidator;
 import com.github.rbaul.spring.boot.security.web.controllers.validators.RoleUpdateRequestDtoValidator;
@@ -51,12 +52,14 @@ public class RoleController {
         return roleService.getRole(roleId);
     }
 
+    @ActivityLog("Deleted role {{roleId}}")
     @ApiOperation(value = "Delete Role")
     @DeleteMapping("{roleId}")
     public void deleteRole(@PathVariable long roleId) {
         roleService.deleteRole(roleId);
     }
 
+    @ActivityLog("Updated role {{roleId}}")
     @ApiOperation(value = "Update Role")
     @PutMapping("{roleId}")
     public RoleResponseDto updateRole(@PathVariable long roleId, @RequestBody @Validated RoleUpdateRequestDto roleUpdateRequestDto, BindingResult bindingResult) throws NoSuchMethodException, MethodArgumentNotValidException {
@@ -69,6 +72,7 @@ public class RoleController {
         return roleService.updateRole(roleId, roleUpdateRequestDto);
     }
 
+    @ActivityLog("Created role {{roleCreateRequestDto." + RoleCreateRequestDto.Fields.name +"}}")
     @ApiOperation(value = "Create Role")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping

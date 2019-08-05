@@ -1,12 +1,13 @@
 package com.github.rbaul.spring.boot.security.web.dtos;
 
+import com.github.rbaul.spring.boot.activity_log.objects.ActivityLogStatus;
 import com.github.rbaul.spring.boot.security.domain.model.types.ProductState;
 import com.github.rbaul.spring.boot.security.web.ValidationGroups;
 import io.swagger.annotations.ApiModel;
 import lombok.*;
-import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.Null;
+import java.util.Date;
 
 @ApiModel("Product")
 @Getter
@@ -14,18 +15,16 @@ import javax.validation.constraints.Null;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@FieldNameConstants
 @Builder
-public class ProductDto extends AuditableDto {
+public class ActivityLogDto {
 
-    @Null(groups = ValidationGroups.Create.class)
     private Long id;
 
-    private String name;
+    private String username;
 
-    private String description;
+    private String action;
 
-    private Double price;
+    private Date time;
 
-    private ProductState state;
+    private ActivityLogStatus status;
 }

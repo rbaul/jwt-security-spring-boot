@@ -1,8 +1,10 @@
 package com.github.rbaul.spring.boot.security.web.controllers;
 
+import com.github.rbaul.spring.boot.activity_log.config.ActivityLog;
 import com.github.rbaul.spring.boot.security.services.UserService;
 import com.github.rbaul.spring.boot.security.web.controllers.validators.UserCreateRequestDtoValidator;
 import com.github.rbaul.spring.boot.security.web.controllers.validators.UserUpdateRequestDtoValidator;
+import com.github.rbaul.spring.boot.security.web.dtos.RoleUpdateRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserCreateRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserResponseDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserUpdateRequestDto;
@@ -46,6 +48,7 @@ public class UserController {
         binder.addValidators(userCreateRequestDtoValidator);
     }
 
+    @ActivityLog("Created new user {{userCreateRequestDto." + UserCreateRequestDto.Fields.username +"}}")
     @ApiOperation(value = "Create user")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -53,6 +56,7 @@ public class UserController {
         return userService.create(userCreateRequestDto);
     }
 
+    @ActivityLog("Updated user {{userId}}")
     @ApiOperation(value = "Update user")
     @PutMapping("{userId}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -89,6 +93,7 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+    @ActivityLog("Deleted user {{userId}}")
     @ApiOperation(value = "Delete user")
     @DeleteMapping("{userId}")
     public void deleteUser(@PathVariable long userId) {

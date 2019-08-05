@@ -32,6 +32,8 @@ security.jwt:
       description: "Change privilege"
     - name: ROLE_VIEW_PRIVILEGE
       description: "View privilege"
+    - name: ROLE_ACTIVITY_PRIVILEGE
+      description: "Activity log privilege"
 #  administrator:
 #    username: admin
 #    password: admin

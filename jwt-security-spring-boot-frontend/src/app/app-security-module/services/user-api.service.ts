@@ -45,7 +45,7 @@ export class UserApiService {
     return this.http.get<UserResponseDto>(API_URL + '/' + userId, httpOptions);
   }
 
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(API_URL + '/' + id.toString(), httpOptions);
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(API_URL + '/' + userId, httpOptions);
   }
 }

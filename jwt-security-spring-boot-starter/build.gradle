@@ -22,6 +22,7 @@ sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
+	maven { url "https://oss.sonatype.org/content/groups/public" }
 }
 
 bootJar { enabled = false }
@@ -32,6 +33,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation('org.springframework.boot:spring-boot-starter')
+
+	implementation 'com.github.rbaul:activity-log-spring-boot:1.0.0-SNAPSHOT'
 
 	compileOnly 'org.projectlombok:lombok:1.18.4'
 	implementation('org.springframework.boot:spring-boot-configuration-processor')
