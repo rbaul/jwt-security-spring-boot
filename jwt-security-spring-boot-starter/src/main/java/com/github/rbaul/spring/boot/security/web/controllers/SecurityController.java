@@ -1,9 +1,11 @@
 package com.github.rbaul.spring.boot.security.web.controllers;
 
+import com.github.rbaul.spring.boot.activity_log.config.ActivityLog;
 import com.github.rbaul.spring.boot.security.config.JwtSecurityProperties;
 import com.github.rbaul.spring.boot.security.services.UserService;
 import com.github.rbaul.spring.boot.security.web.dtos.LoginRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.LoginResponseDto;
+import com.github.rbaul.spring.boot.security.web.dtos.RoleUpdateRequestDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +28,14 @@ public class SecurityController {
 
     private final UserService userService;
 
+    @ActivityLog("User login '{{loginRequestDto." + LoginRequestDto.Fields.username +"}}'")
     @ApiOperation(value = "Login")
     @PostMapping("login")
     public LoginResponseDto login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
         return userService.login(loginRequestDto.getUsername(), loginRequestDto.getPassword());
     }
 
+    @ActivityLog("User logout")
     @ApiOperation(value = "Logout")
     @PostMapping("logout")
     public void logout(HttpServletRequest request) {
