@@ -1,9 +1,12 @@
 package com.github.rbaul.spring.boot.security.services;
 
+import com.github.rbaul.spring.boot.security.config.JwtSecurityProperties;
 import com.github.rbaul.spring.boot.security.domain.model.Role;
 import com.github.rbaul.spring.boot.security.domain.model.User;
 import com.github.rbaul.spring.boot.security.domain.repository.RoleRepository;
 import com.github.rbaul.spring.boot.security.domain.repository.UserRepository;
+import com.github.rbaul.spring.boot.security.services.exceptions.UserException;
+import com.github.rbaul.spring.boot.security.services.utils.SessionUtils;
 import com.github.rbaul.spring.boot.security.web.dtos.LoginResponseDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserCreateRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserResponseDto;
@@ -17,14 +20,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,6 +51,8 @@ public class UserService {
     private final DefaultUserDetailsService defaultUserDetailsService;
 
     private final ModelMapper modelMapper;
+
+    private final JwtSecurityProperties.JwtSecurityAdministratorUserProperties administratorUserProperties;
 
     /**
      * Sign in a user into the application, with JWT-enabled authentication
@@ -136,8 +142,29 @@ public class UserService {
     @Transactional
     public void deleteUser(long userId) {
         User user = getUserById(userId);
+
+        validateDeleteUser(user);
+
         user.getRoles().forEach(role -> role.removeUser(user));
         userRepository.deleteById(userId);
+    }
+
+    /**
+     * Validate delete user
+     */
+    private void validateDeleteUser(User user) {
+        String currentUsername = SessionUtils.getCurrentUsername().orElse(null);
+        if (Objects.equals(currentUsername, user.getUsername())) {
+            throw new UserException("Can't delete self user");
+        }
+
+        String administratorPrivilegeName = administratorUserProperties.getPrivilegeName();
+        boolean containsAdministratorPrivilegeName = user.getPrivilegeNames().contains(administratorPrivilegeName);
+
+        if (containsAdministratorPrivilegeName) {
+            long countOfAdminUsers = userRepository.countByRoles_privileges_name(administratorPrivilegeName);
+            if (countOfAdminUsers == 1) throw new UserException("User with administrator privilege must be no less than one");
+        }
     }
 
     private User getUserById(long userId) {

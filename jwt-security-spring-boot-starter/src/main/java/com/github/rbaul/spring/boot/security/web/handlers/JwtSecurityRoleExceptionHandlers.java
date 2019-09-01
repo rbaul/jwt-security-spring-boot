@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class JwtSecurityRoleExceptionHandlers {
 
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RoleException.class)
-    public ErrorDto handleAccessDeniedException(RoleException ex) {
+    public ErrorDto handleRoleException(RoleException ex) {
         return ErrorDto.builder()
                 .errorCode(ex.getMessage()).build();
     }

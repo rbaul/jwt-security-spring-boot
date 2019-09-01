@@ -2,6 +2,7 @@ package com.github.rbaul.spring.boot.security.domain.model;
 
 import com.github.rbaul.spring.boot.activity_log.objects.ActivityLogStatus;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+@FieldNameConstants
 @Getter
 @Setter
 @NoArgsConstructor

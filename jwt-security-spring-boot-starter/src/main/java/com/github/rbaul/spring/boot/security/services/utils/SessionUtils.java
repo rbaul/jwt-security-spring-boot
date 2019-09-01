@@ -1,6 +1,9 @@
 package com.github.rbaul.spring.boot.security.services.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -27,6 +30,16 @@ public class SessionUtils {
             value = jsessionidCookie.map(Cookie::getValue).orElse(null);
         }
         return Optional.ofNullable(value);
+    }
+
+    public static Optional<String> getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || !(authentication.getPrincipal() instanceof UserDetails)) {
+            return Optional.of("anonymous");
+        }
+
+        return Optional.of(((UserDetails) authentication.getPrincipal()).getUsername());
     }
 
 }

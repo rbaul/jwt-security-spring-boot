@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Page } from '../../app-security-module/models/page';
 import { ActivityLog } from '../models/activity-log';
@@ -28,7 +28,14 @@ export class ActivityLogApiService {
     return this.http.delete<void>(API_URL + '/' + activityLogId, httpOptions);
   }
 
-  getPageableActivityLog(): Observable<Page<ActivityLog>> {
-    return this.http.get<Page<ActivityLog>>(API_URL);
+  getPageableActivityLog(pageSize: number, pageNumber: number,
+     sort: string[], filter: string):  Observable<Page<ActivityLog>> {
+
+    let httpParams = new HttpParams()
+      .set('page', pageNumber.toString())
+      .set('size', pageSize.toString())
+      .set('filter', filter);
+    sort.forEach(sortParam => httpParams = httpParams.append('sort', sortParam));
+    return this.http.get<Page<ActivityLog>>(API_URL, {params: httpParams});
   }
 }

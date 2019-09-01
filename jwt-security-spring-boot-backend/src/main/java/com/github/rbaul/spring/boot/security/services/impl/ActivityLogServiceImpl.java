@@ -32,8 +32,8 @@ public class ActivityLogServiceImpl implements ActivityLogReceiver {
     }
 
     @Transactional(readOnly = true)
-    public Page<ActivityLogDto> getPageable(Pageable pageable) {
-        return activityLogRepository.findAll(pageable)
+    public Page<ActivityLogDto> getPageable(String filter, Pageable pageable) {
+        return activityLogRepository.findAll(ActivityLogRepository.filterEveryWay(filter), pageable)
                 .map(activityLog -> modelMapper.map(activityLog, ActivityLogDto.class));
     }
 

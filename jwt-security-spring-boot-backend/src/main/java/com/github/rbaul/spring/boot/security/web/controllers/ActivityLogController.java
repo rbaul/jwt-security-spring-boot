@@ -53,11 +53,11 @@ public class ActivityLogController {
             @ApiResponse(code = 200, message = "Successfully lists activity logs")})
     @Secured({"ROLE_ACTIVITY_PRIVILEGE"})
     @GetMapping
-    public Page<ActivityLogDto> fetch(@PageableDefault @ApiIgnore(
+    public Page<ActivityLogDto> fetch(@RequestParam String filter, @PageableDefault @ApiIgnore(
             "Ignored because swagger ui shows the wrong params, " +
                     "instead they are explained in the implicit params"
     ) Pageable pageable) {
-        return activityLogService.getPageable(pageable);
+        return activityLogService.getPageable(filter, pageable);
     }
 
 }
