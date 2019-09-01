@@ -1,16 +1,32 @@
 mat-card {
-    width: 300px;
-    max-width: 400px;
+    width: 560px;
+    max-width: 560px;
     margin: 2em auto;
     text-align: center;
     // background-color: transparent;
-    background-color:  lightgrey;
+    // background-color:  lightgrey;
+    background: rgba(225, 225, 225, 0.7);
+    padding-top: 40px;
+    padding-bottom: 60px;
 }
 .login-container {
     height: 100vh;
+    // width: 100vh;
     // background-color: #eee;
-    background-color:  #3f51b5;
+    // background-color:  #3f51b5;
+    background-image: url("https://cdn.pixabay.com/photo/2018/03/02/18/29/snow-3193865_960_720.jpg");
+
+      /* Full height */
+//   height: 100%; 
+//   width: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+    
 }
 .full-width-input {
     width: 80%;
+    font-size: 1rem;
 }
