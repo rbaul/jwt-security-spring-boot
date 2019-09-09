@@ -23,7 +23,7 @@ export class ActivityLogComponent implements OnInit, AfterViewInit {
   dataSource: GenericDataSource<ActivityLog>;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['id', 'user', 'action', 'time', 'status', 'actions'];
+  displayedColumns = ['id', 'username', 'action', 'time', 'status', 'actions'];
 
   pageSize = 10;
   pageSizeOptions = [10, 50, 100];

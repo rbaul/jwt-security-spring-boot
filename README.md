@@ -7,6 +7,9 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/rbaul/jwt-security-spring-boot/badge)](https://www.codefactor.io/repository/github/rbaul/jwt-security-spring-boot)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
+## Demo
+![](demo/jwt-security-demo.gif)
+
 ## Build on
 >* Java 8
 >* Spring Boot 2.1.2
