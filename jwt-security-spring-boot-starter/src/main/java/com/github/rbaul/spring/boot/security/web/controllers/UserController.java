@@ -4,7 +4,6 @@ import com.github.rbaul.spring.boot.activity_log.config.ActivityLog;
 import com.github.rbaul.spring.boot.security.services.UserService;
 import com.github.rbaul.spring.boot.security.web.controllers.validators.UserCreateRequestDtoValidator;
 import com.github.rbaul.spring.boot.security.web.controllers.validators.UserUpdateRequestDtoValidator;
-import com.github.rbaul.spring.boot.security.web.dtos.RoleUpdateRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserCreateRequestDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserResponseDto;
 import com.github.rbaul.spring.boot.security.web.dtos.UserUpdateRequestDto;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -48,7 +46,7 @@ public class UserController {
         binder.addValidators(userCreateRequestDtoValidator);
     }
 
-    @ActivityLog("Created new user {{userCreateRequestDto." + UserCreateRequestDto.Fields.username +"}}")
+    @ActivityLog("Created new user {{userCreateRequestDto." + UserCreateRequestDto.Fields.username + "}}")
     @ApiOperation(value = "Create user")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -71,20 +69,20 @@ public class UserController {
     }
 
     @ApiOperation(value = "Get all users")
-    @GetMapping("all")
+    @GetMapping
     public List<UserResponseDto> getAllUsers() {
         return userService.getAll();
     }
 
-    @ApiOperation(value = "Fetch all users with paging")
+    @ApiOperation(value = "Fetch all users with paging and filter")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Successfully lists products")})
-    @GetMapping
-    public Page<UserResponseDto> getPageUsers(@PageableDefault @ApiIgnore(
+            @ApiResponse(code = 200, message = "Successfully page users")})
+    @GetMapping("search")
+    public Page<UserResponseDto> search(@RequestParam(required = false) String filter, @PageableDefault @ApiIgnore(
             "Ignored because swagger ui shows the wrong params, " +
                     "instead they are explained in the implicit params"
     ) Pageable pageable) {
-        return userService.getPageable(pageable);
+        return userService.search(filter, pageable);
     }
 
     @ApiOperation(value = "Get user")

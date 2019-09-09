@@ -1,6 +1,7 @@
 package com.github.rbaul.spring.boot.security.domain.model;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldNameConstants
 @Entity
 @Table(name = "security_user")
 public class User extends AuditableEntity {

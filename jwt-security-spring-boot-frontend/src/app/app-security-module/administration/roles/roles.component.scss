@@ -1,18 +1,18 @@
 .full-width-table {
     width: 100%;
 }
-  
+
 #add-button {
     right: 20px;
     bottom: 30px;
     position: fixed;
 }
-  
+
 tr.mat-row:hover {
     background-color: #b1b8dc;
     cursor: pointer;
 }
-  
+
 .fill-remaining-space {
     /* This fills the remaining space, by using flexbox. 
        Every toolbar row uses a flexbox row layout. */
@@ -22,4 +22,7 @@ tr.mat-row:hover {
 .mat-column-privilegeNames {
     padding-left: 0;
 }
-  
+
+.spinner-container mat-spinner {
+    margin: 130px auto 0 auto;
+}

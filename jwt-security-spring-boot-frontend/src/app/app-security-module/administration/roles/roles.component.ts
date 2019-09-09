@@ -1,8 +1,11 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { MatDialog, MatSort, MatPaginator, MatTableDataSource, MatDialogRef, MatDialogConfig, MatSnackBar } from '@angular/material';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogConfig, MatDialogRef, MatPaginator, MatSnackBar, MatSort } from '@angular/material';
+import { fromEvent, merge } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { PrivilegeResponseDto, RoleResponseDto } from 'src/app/app-security-module/models/role';
 import { RoleApiService } from 'src/app/app-security-module/services/role-api.service';
-import { RoleResponseDto, PrivilegeResponseDto } from 'src/app/app-security-module/models/role';
 import { DialogService } from 'src/app/app-security-module/shared/common-dialogs/dialog.service';
+import { GenericDataSource } from '../../models/generic.datasource';
 import { RoleDialogComponent } from './role-dialog/role-dialog.component';
 
 @Component({
@@ -12,8 +15,15 @@ import { RoleDialogComponent } from './role-dialog/role-dialog.component';
 })
 export class RolesComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
+
   @ViewChild(MatSort) sort: MatSort;
-  dataSource: MatTableDataSource<RoleResponseDto> = new MatTableDataSource();
+
+  @ViewChild('input') input: ElementRef;
+
+  dataSource: GenericDataSource<RoleResponseDto>;
+
+  pageSize = 10;
+  pageSizeOptions = [10, 50, 100];
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['id', 'name', 'description', 'privilegeNames', 'actions'];
@@ -23,27 +33,42 @@ export class RolesComponent implements OnInit, AfterViewInit {
     private roleApiService: RoleApiService,
     private dialogService: DialogService,
     private _snackBar: MatSnackBar
-    ) { }
+  ) { }
 
   ngOnInit() {
-    this.refreshRoles();
-  }
-
-  private refreshRoles() {
-    this.roleApiService.getAllRoles().subscribe(roles => {
-      this.dataSource.data = roles;
-    });
+    this.dataSource = new GenericDataSource(this.roleApiService);
+    this.dataSource.loadContent(this.pageSize, 0, [], '');
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // If the user changes the sort order, reset back to the first page.
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    fromEvent(this.input.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => {
+          // reset back to the first page.
+          this.paginator.pageIndex = 0;
+
+          this.loadContent();
+        })
+      )
+      .subscribe();
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => this.loadContent())
+      ).subscribe();
   }
 
-
-  applyFilter(filterValue: string): void {
-    filterValue = filterValue.trim().toLocaleLowerCase();
-    this.dataSource.filter = filterValue;
+  loadContent() {
+    this.dataSource.loadContent(
+      this.paginator.pageSize,
+      this.paginator.pageIndex,
+      this.sort.active && [this.sort.active + ',' + this.sort.direction],
+      this.input.nativeElement.value);
   }
 
   getPrivilegeNames(privileges: PrivilegeResponseDto[]): string[] {
@@ -68,7 +93,7 @@ export class RolesComponent implements OnInit, AfterViewInit {
           this.roleApiService.create(data).subscribe(
             response => {
               this._snackBar.open('Role has been created successfully');
-              this.refreshRoles();
+              this.loadContent();
             }
           );
         }
@@ -84,7 +109,7 @@ export class RolesComponent implements OnInit, AfterViewInit {
             this.roleApiService.update(role.id, data).subscribe(
               response => {
                 this._snackBar.open('Role has been updated successfully');
-                this.refreshRoles();
+                this.loadContent();
               });
           }
         }
@@ -103,7 +128,7 @@ export class RolesComponent implements OnInit, AfterViewInit {
           this.roleApiService.deleteRole(roleId).subscribe(
             response => {
               this._snackBar.open('Role has been deleted successfully');
-              this.refreshRoles();
+              this.loadContent();
             }
           );
         }

@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,5 +47,11 @@ public class PrivilegeService {
     private Privilege getPrivilegeById(long privilegeId) {
         return privilegeRepository.findById(privilegeId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("No found privilege with id: " + privilegeId, 1));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PrivilegeResponseDto> search(String filter, Pageable pageable) {
+        return privilegeRepository.findAll(PrivilegeRepository.filterEveryWay(filter), pageable)
+                .map(privilege -> modelMapper.map(privilege, PrivilegeResponseDto.class));
     }
 }

@@ -2,7 +2,7 @@ package com.github.rbaul.spring.boot.security.domain.model;
 
 import com.github.rbaul.spring.boot.security.domain.model.types.ProductState;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.*;
 
@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldNameConstants
 @Builder
 @ToString
 @EqualsAndHashCode(of = "id", callSuper = false)

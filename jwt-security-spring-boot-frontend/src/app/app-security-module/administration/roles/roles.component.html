@@ -1,68 +1,74 @@
 <!-- <div class="mat-elevation-z8"> -->
 <div>
-    <mat-toolbar>
-      <span>Roles</span>
-      <span class="fill-remaining-space"></span>
-      <mat-form-field floatLabel="never">
-        <input matInput type="search" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-        <mat-icon matSuffix style="font-size: 120%">search</mat-icon>
-      </mat-form-field>
-    </mat-toolbar>
-    <button mat-fab color="primary" id="add-button" matTooltip="Add role" (click)="createRole()"><i class="material-icons" >add</i></button>
-    <table mat-table class="full-width-table" [dataSource]="dataSource" matSort aria-label="Elements" multiTemplateDataRows>
+  <mat-toolbar>
+    <span>Roles</span>
+    <span class="fill-remaining-space"></span>
+    <!-- <div [hidden]="dataSource.loading$ | async"> -->
+    <mat-form-field floatLabel="never">
+      <input matInput type="search" placeholder="Filter..." #input>
+      <mat-icon matSuffix style="font-size: 120%">search</mat-icon>
+    </mat-form-field>
+    <!-- </div> -->
+  </mat-toolbar>
+
+  <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div [hidden]="dataSource.loading$ | async">
+    <button mat-fab color="primary" id="add-button" matTooltip="Add role" (click)="createRole()"><i
+        class="material-icons">add</i></button>
+    <table mat-table class="full-width-table" [dataSource]="dataSource" matSort aria-label="Elements"
+      multiTemplateDataRows>
       <!-- Id Column -->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
         <td mat-cell *matCellDef="let row">{{row.id}}</td>
       </ng-container>
-  
+
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
         <td mat-cell *matCellDef="let row">{{row.name}}</td>
       </ng-container>
-  
+
       <!-- Description Column -->
       <ng-container matColumnDef="description">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
         <td mat-cell *matCellDef="let row">{{row.description}}</td>
       </ng-container>
-  
+
       <!-- Privilege Names Column -->
       <ng-container matColumnDef="privilegeNames">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Privileges</th>
-        <td mat-cell *matCellDef="let row" >
+        <td mat-cell *matCellDef="let row">
           <mat-cell matTooltip="{{privilege.description}} " *ngFor="let privilege of row.privileges">
-              {{privilege.name}} 
+            {{privilege.name}}
           </mat-cell>
         </td>
       </ng-container>
-  
+
       <!-- actions -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
-  
+
         <td mat-cell *matCellDef="let row">
           <button mat-icon-button color="primary" matTooltip="Edit role" (click)="editRole(row.id)">
             <mat-icon>edit</mat-icon>
           </button>
-  
+
           <button mat-icon-button color="primary" matTooltip="Remove role" (click)="deleteRole(row.id)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>
       </ng-container>
-  
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick) = "editRole(row)"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="editRole(row)"></tr>
     </table>
-  
-    <mat-paginator #paginator
-        [length]="dataSource.data.length"
-        [pageIndex]="0"
-        [pageSize]="20"
-        [pageSizeOptions]="[10, 20, 50, 100]">
+
+    <mat-paginator #paginator [length]="dataSource.totalElements$ | async" [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions">
     </mat-paginator>
   </div>
-                
-          
+</div>

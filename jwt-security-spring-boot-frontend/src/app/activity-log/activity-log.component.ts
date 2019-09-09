@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
-import { MatPaginator, MatSort, MatSnackBar } from '@angular/material';
-import { ActivityLog, ActivityLogStatus } from './models/activity-log';
-import { DialogService } from '../app-security-module/shared/common-dialogs/dialog.service';
-import { ActivityLogApiService } from './services/activity-log-api.service';
-import { merge, fromEvent } from 'rxjs';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, MatSnackBar, MatSort } from '@angular/material';
+import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { ActivityLogDataSource } from './models/activity-log.datasource';
+import { GenericDataSource } from '../app-security-module/models/generic.datasource';
+import { DialogService } from '../app-security-module/shared/common-dialogs/dialog.service';
+import { ActivityLog, ActivityLogStatus } from './models/activity-log';
+import { ActivityLogApiService } from './services/activity-log-api.service';
 
 @Component({
   selector: 'app-activity-log',
@@ -20,13 +20,13 @@ export class ActivityLogComponent implements OnInit, AfterViewInit {
 
   @ViewChild('input') input: ElementRef;
 
-  dataSource: ActivityLogDataSource;
+  dataSource: GenericDataSource<ActivityLog>;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['id', 'user', 'action', 'time', 'status', 'actions'];
 
-  pageSize = 2;
-  pageSizeOptions = [2, 10, 50, 100];
+  pageSize = 10;
+  pageSizeOptions = [10, 50, 100];
 
   constructor(
     private activityLogApiService: ActivityLogApiService,
@@ -35,7 +35,7 @@ export class ActivityLogComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit() {
-    this.dataSource = new ActivityLogDataSource(this.activityLogApiService);
+    this.dataSource = new GenericDataSource(this.activityLogApiService);
     this.dataSource.loadContent(this.pageSize, 0, ['time,desc'], '');
   }
 
@@ -44,29 +44,29 @@ export class ActivityLogComponent implements OnInit, AfterViewInit {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
     fromEvent(this.input.nativeElement, 'keyup')
-        .pipe(
-            debounceTime(300),
-            distinctUntilChanged(),
-            tap(() => {
-              // reset back to the first page.
-              this.paginator.pageIndex = 0;
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => {
+          // reset back to the first page.
+          this.paginator.pageIndex = 0;
 
-              this.loadActivityLogContent();
-            })
-        )
-        .subscribe();
+          this.loadActivityLogContent();
+        })
+      )
+      .subscribe();
 
     merge(this.sort.sortChange, this.paginator.page)
-    .pipe(
+      .pipe(
         tap(() => this.loadActivityLogContent())
-    ).subscribe();
+      ).subscribe();
   }
 
   loadActivityLogContent() {
     this.dataSource.loadContent(
       this.paginator.pageSize,
       this.paginator.pageIndex,
-      [this.sort.active + ',' + this.sort.direction],
+      this.sort.active && [this.sort.active + ',' + this.sort.direction],
       this.input.nativeElement.value);
   }
 

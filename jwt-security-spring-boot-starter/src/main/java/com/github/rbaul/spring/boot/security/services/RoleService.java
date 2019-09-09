@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,5 +92,11 @@ public class RoleService {
         Collection<Privilege> privileges = privilegeRepository.findByIdIn(roleUpdateRequestDto.getPrivilegeIds());
         role.setPrivileges(privileges);
         return modelMapper.map(role, RoleResponseDto.class);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RoleResponseDto> search(String filter, Pageable pageable) {
+        return roleRepository.findAll(RoleRepository.filterEveryWay(filter), pageable)
+                .map(role -> modelMapper.map(role, RoleResponseDto.class));
     }
 }

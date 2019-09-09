@@ -20,10 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,8 +127,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponseDto> getPageable(Pageable pageable) {
-        Page<User> usersPage = userRepository.findAll(pageable);
+    public Page<UserResponseDto> search(String filter, Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(UserRepository.filterEveryWay(filter), pageable);
         return usersPage.map(user -> modelMapper.map(user, UserResponseDto.class));
     }
 
@@ -163,7 +159,8 @@ public class UserService {
 
         if (containsAdministratorPrivilegeName) {
             long countOfAdminUsers = userRepository.countByRoles_privileges_name(administratorPrivilegeName);
-            if (countOfAdminUsers == 1) throw new UserException("User with administrator privilege must be no less than one");
+            if (countOfAdminUsers == 1)
+                throw new UserException("User with administrator privilege must be no less than one");
         }
     }
 

@@ -1,6 +1,7 @@
 package com.github.rbaul.spring.boot.security.domain.model;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.CollectionUtils;
 
@@ -13,6 +14,7 @@ import java.util.Collection;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldNameConstants
 @Builder
 @Entity
 @Table(name = "security_privilege")

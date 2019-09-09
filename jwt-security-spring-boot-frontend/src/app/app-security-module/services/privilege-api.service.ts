@@ -1,7 +1,8 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PrivilegeResponseDto } from '../models/role';
+import { PageableApiService } from './pageable-api-service';
 
 
 const API_URL = '/api/privileges';
@@ -14,11 +15,13 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class PrivilegeApiService {
+export class PrivilegeApiService extends PageableApiService<PrivilegeResponseDto> {
 
   constructor(
-    private http: HttpClient
-  ) { }
+    http: HttpClient
+  ) {
+    super(http, API_URL);
+  }
 
   getPrivileges(): Observable<PrivilegeResponseDto[]> {
     return this.http.get<PrivilegeResponseDto[]>(API_URL, httpOptions);
@@ -27,4 +30,5 @@ export class PrivilegeApiService {
   getPrivilege(privilegeId: number): Observable<PrivilegeResponseDto> {
     return this.http.get<PrivilegeResponseDto>(API_URL + '/' + privilegeId, httpOptions);
   }
+
 }

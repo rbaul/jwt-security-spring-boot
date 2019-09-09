@@ -11,7 +11,7 @@ export class ActivityLogDataSource extends PageableDataSource<ActivityLog> {
     }
 
     getPageableContent(pageSize: number, pageIndex: number, sort: string[], filter: string): Observable<Page<ActivityLog>> {
-        return this.activityLogApiService.getPageableActivityLog(pageSize, pageIndex, sort, filter);
+        return this.activityLogApiService.search(pageSize, pageIndex, sort, filter);
     }
 
 }

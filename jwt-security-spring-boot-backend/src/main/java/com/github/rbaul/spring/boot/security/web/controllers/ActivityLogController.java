@@ -47,13 +47,13 @@ public class ActivityLogController {
         activityLogService.delete(activityLogId);
     }
 
-    @ApiOperation(value = "Fetch all activity logs with paging")
+    @ApiOperation(value = "Fetch all activity logs with paging by filter")
     @ApiImplicitPageable
     @ApiResponses({
             @ApiResponse(code = 200, message = "Successfully lists activity logs")})
     @Secured({"ROLE_ACTIVITY_PRIVILEGE"})
-    @GetMapping
-    public Page<ActivityLogDto> fetch(@RequestParam String filter, @PageableDefault @ApiIgnore(
+    @GetMapping("search")
+    public Page<ActivityLogDto> fetch(@RequestParam(required = false) String filter, @PageableDefault @ApiIgnore(
             "Ignored because swagger ui shows the wrong params, " +
                     "instead they are explained in the implicit params"
     ) Pageable pageable) {

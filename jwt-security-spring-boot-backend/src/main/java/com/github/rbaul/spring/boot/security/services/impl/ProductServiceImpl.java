@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public void delete(Long productId) {
-        if (!productRepository.existsById(productId)){
+        if (!productRepository.existsById(productId)) {
             throw new EmptyResultDataAccessException("No found product with id: " + productId, 1);
         }
         productRepository.deleteById(productId);
@@ -74,8 +74,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDto> getPageable(Pageable pageable) {
-        return productRepository.findAll(pageable)
+    public Page<ProductDto> search(String filter, Pageable pageable) {
+        return productRepository.findAll(ProductRepository.filterEveryWay(filter), pageable)
                 .map(product -> modelMapper.map(product, ProductDto.class));
     }
 }

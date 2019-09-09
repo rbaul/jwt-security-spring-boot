@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../models/product';
 import { Page } from '../../app-security-module/models/page';
+import { PageableApiService } from 'src/app/app-security-module/services/pageable-api-service';
 
 const API_URL = '/api/products';
 const httpOptions = {
@@ -14,12 +15,14 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class ProductService {
+export class ProductService extends PageableApiService<Product> {
 
-  constructor(private http: HttpClient) { }
+  constructor(http: HttpClient) {
+    super(http, API_URL);
+   }
 
   getAllProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(API_URL + '/all');
+    return this.http.get<Product[]>(API_URL);
   }
 
   getPageableProducts(): Observable<Page<Product>> {

@@ -1,8 +1,9 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { User, UserResponseDto, UserRequestDto } from '../models/user';
 import { Observable } from 'rxjs';
 import { Page } from '../models/page';
+import { User, UserRequestDto, UserResponseDto } from '../models/user';
+import { PageableApiService } from './pageable-api-service';
 
 
 const API_URL = '/api/users';
@@ -15,14 +16,16 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class UserApiService {
+export class UserApiService extends PageableApiService<UserResponseDto> {
 
   constructor(
-    private http: HttpClient
-  ) { }
+    http: HttpClient
+  ) {
+    super(http, API_URL);
+  }
 
   public create(singup: UserRequestDto): Observable<UserResponseDto> {
-    return this.http.post<UserResponseDto>(API_URL , singup, httpOptions);
+    return this.http.post<UserResponseDto>(API_URL, singup, httpOptions);
   }
 
   public update(userId: number, request: UserRequestDto): Observable<UserResponseDto> {
@@ -34,7 +37,7 @@ export class UserApiService {
   }
 
   getAllUsers(): Observable<UserResponseDto[]> {
-    return this.http.get<UserResponseDto[]>(API_URL + '/all', httpOptions);
+    return this.http.get<UserResponseDto[]>(API_URL, httpOptions);
   }
 
   getPageableUsers(): Observable<Page<UserResponseDto>> {

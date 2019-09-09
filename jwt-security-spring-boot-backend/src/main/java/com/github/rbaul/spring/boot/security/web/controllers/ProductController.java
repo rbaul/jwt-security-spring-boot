@@ -46,7 +46,7 @@ public class ProductController {
     @ApiResponses({@ApiResponse(code = 200, message = "Retrieved All Product")})
     @ResponseStatus(code = HttpStatus.OK)
     @Secured({"ROLE_VIEW_PRIVILEGE"})
-    @GetMapping("all")
+    @GetMapping
     public List<ProductDto> getAllProduct() {
         return productService.getAll();
     }
@@ -96,12 +96,12 @@ public class ProductController {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Successfully lists products")})
     @Secured({"ROLE_VIEW_PRIVILEGE"})
-    @GetMapping
-    public Page<ProductDto> fetch(@PageableDefault @ApiIgnore(
+    @GetMapping("search")
+    public Page<ProductDto> fetch(@RequestParam(required = false) String filter, @PageableDefault @ApiIgnore(
             "Ignored because swagger ui shows the wrong params, " +
                     "instead they are explained in the implicit params"
     ) Pageable pageable) {
-        return productService.getPageable(pageable);
+        return productService.search(filter, pageable);
     }
 
 }

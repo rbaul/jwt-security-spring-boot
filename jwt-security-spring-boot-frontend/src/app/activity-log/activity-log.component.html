@@ -2,14 +2,14 @@
 <div>
   <mat-toolbar>
     <span>Activity Log</span>
-    
+
     <span class="fill-remaining-space"></span>
 
     <!-- <div [hidden]="dataSource.loading$ | async"> -->
-      <mat-form-field floatLabel="never">
-        <input matInput type="search" placeholder="Filter..." #input>
-        <mat-icon matSuffix style="font-size: 120%">search</mat-icon>
-      </mat-form-field>
+    <mat-form-field floatLabel="never">
+      <input matInput type="search" placeholder="Filter..." #input>
+      <mat-icon matSuffix style="font-size: 120%">search</mat-icon>
+    </mat-form-field>
     <!-- </div> -->
   </mat-toolbar>
 
@@ -18,60 +18,59 @@
   </div>
 
   <div [hidden]="dataSource.loading$ | async">
-  <table mat-table class="full-width-table" [dataSource]="dataSource" matSort aria-label="Elements"
-    matSortActive="time" matSortDirection="desc">
-    <!-- Id Column -->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
-      <td mat-cell *matCellDef="let row">{{row.id}}</td>
-    </ng-container>
+    <table mat-table class="full-width-table" [dataSource]="dataSource" matSort aria-label="Elements"
+      matSortActive="time" matSortDirection="desc">
+      <!-- Id Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+        <td mat-cell *matCellDef="let row">{{row.id}}</td>
+      </ng-container>
 
-    <!-- Username Column -->
-    <ng-container matColumnDef="user">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
-      <td mat-cell *matCellDef="let row">{{row.username}}</td>
-    </ng-container>
+      <!-- Username Column -->
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+        <td mat-cell *matCellDef="let row">{{row.username}}</td>
+      </ng-container>
 
-    <!-- Action Column -->
-    <ng-container matColumnDef="action">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Action</th>
-      <td mat-cell *matCellDef="let row">{{row.action}}</td>
-    </ng-container>
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Action</th>
+        <td mat-cell *matCellDef="let row">{{row.action}}</td>
+      </ng-container>
 
-    <!-- Time Column -->
-    <ng-container matColumnDef="time">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Time</th>
-      <td mat-cell *matCellDef="let row">{{row.time | date:'MMM d, y H:mm:ss'}}</td>
-    </ng-container>
+      <!-- Time Column -->
+      <ng-container matColumnDef="time">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Time</th>
+        <td mat-cell *matCellDef="let row">{{row.time | date:'MMM d, y H:mm:ss'}}</td>
+      </ng-container>
 
-    <!-- Status Column -->
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-      <td mat-cell *matCellDef="let row">
-        <mat-icon *ngIf="isActivityLogSuccess(row.status)" class="color-success" matListIcon>check_circle_outline</mat-icon>
-        <mat-icon *ngIf="!isActivityLogSuccess(row.status)" class="color-fail" matListIcon>error_outline</mat-icon>
-      </td>
-    </ng-container>
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let row">
+          <mat-icon *ngIf="isActivityLogSuccess(row.status)" class="color-success" matListIcon>check_circle_outline
+          </mat-icon>
+          <mat-icon *ngIf="!isActivityLogSuccess(row.status)" class="color-fail" matListIcon>error_outline</mat-icon>
+        </td>
+      </ng-container>
 
-    <!-- actions -->
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
-      <td mat-cell *matCellDef="let row">
-        <button mat-icon-button color="primary" matTooltip="Remove activity" (click)="delete(row)" *hasPrivilege="['ROLE_ACTIVITY_PRIVILEGE']">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
+      <!-- actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button color="primary" matTooltip="Remove activity" (click)="delete(row)"
+            *hasPrivilege="['ROLE_ACTIVITY_PRIVILEGE']">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
 
-  <mat-paginator #paginator
-      [length]="dataSource.totalElements$ | async"
-      [pageSize]="pageSize"
+    <mat-paginator #paginator [length]="dataSource.totalElements$ | async" [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions">
-  </mat-paginator>
+    </mat-paginator>
+  </div>
 </div>
-</div>
-      
