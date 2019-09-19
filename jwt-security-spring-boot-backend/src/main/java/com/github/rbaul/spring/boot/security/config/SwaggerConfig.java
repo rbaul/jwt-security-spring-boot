@@ -46,7 +46,6 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("Security API")
                 .enable(true)
-                .enableUrlTemplating(true)
                 .host(baseIp)
                 .securitySchemes(Collections.singletonList(apiKey()))
                 .securityContexts(Collections.singletonList(securityContext()))
